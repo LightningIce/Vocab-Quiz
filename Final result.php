@@ -96,11 +96,11 @@ header .name {
 <body>
 <header>
     <div class="name">
-    <img src="logo3.png" alt="Logo" class="logo-img">    
+    <img src="images/logo3.png" alt="Logo" class="logo-img">    
     Vocab Quiz</div>
-    <img src="profile2.png" alt="profile" class="profile-img">
+    <img src="images/profile2.png" alt="profile" class="profile-img">
     </header>
-    <img src="easy.png" alt="easy" class="easy-img">
+    <img src="images/easy.png" alt="easy" class="easy-img">
     <div class="Result">
         <h1>Final Result:</h1>
         <h2>35/40</h2>

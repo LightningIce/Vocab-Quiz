@@ -143,9 +143,9 @@ header .name {
 <body>
     <header>
     <div class="name">
-    <img src="logo3.png" alt="Logo" class="logo-img">    
+    <img src="images/logo3.png" alt="Logo" class="logo-img">    
     Vocab Quiz</div>
-    <img src="profile2.png" alt="profile" class="profile-img">
+    <img src="images/profile2.png" alt="profile" class="profile-img">
     </header>
     <div class="quiz-container">
         <div class="quiz-header">
@@ -171,6 +171,6 @@ header .name {
             </button>
         </div>
     </div>
-    <img src="questions.png" alt="question" class="question-img">
+    <img src="images/questions.png" alt="question" class="question-img">
 </body>
 </html> 
