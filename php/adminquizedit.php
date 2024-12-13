@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz Review Page</title>
+    <link rel="stylesheet" href="../css/adminheader.css">
+    <link rel="stylesheet" href="../css/font-awesome.css">
     <style>
         /* General Styling */
         body {
@@ -533,13 +535,7 @@
 </head>
 
 <body>
-    <header>
-        <div class="menu-icon">
-            ☰
-            <span class="logo">Vocab Quiz</span>
-        </div>
-        <div class="user-icon">U</div>
-    </header>
+    <?php include 'adminheader.php'; ?>
 
     <div class="quiz-banner">Business Terms Beginner Level Quiz 1</div>
 
@@ -691,6 +687,7 @@
                 button.classList.add('selected');
             }
         </script>
+        <script src="../js/adminheader.js"></script>
 
 </body>
 
