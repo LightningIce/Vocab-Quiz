@@ -1,4 +1,5 @@
 <header class="admin-header">
+
         <div class="nav-wrap" id="nav-border-hack">
             <div id="header-logo">
                 <div class="header-logo-cat"><a href="adminhome.php"><img src="../images/icon.png" alt="Logo"></a></div>
