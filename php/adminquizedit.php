@@ -383,8 +383,28 @@
 
 
         // JavaScript: Done Button Functionality
+        // Declare the doneButton only once
+        // Select the done button
         const doneButton = document.querySelector('.done-btn');
+
         doneButton.addEventListener('click', () => {
+            const isEditing = Array.from(document.querySelectorAll('.edit-btn')).some(btn => btn.textContent === 'Done');
+
+            if (isEditing) {
+                const confirmed = confirm('There are still questions in edit mode. Do you want to save changes and exit edit mode?');
+                if (!confirmed) return; // If the user cancels, do not proceed
+            }
+
+            // Exit edit mode for all questions
+            const editButtons = document.querySelectorAll('.edit-btn');
+            editButtons.forEach(button => {
+                if (button.textContent === 'Done') {
+                    const parentQuestion = button.closest('.question-item');
+                    button.textContent = 'Edit';
+                    saveAndDisableEditing(parentQuestion); // Save changes and disable editing
+                }
+            });
+
             alert('Quiz review is completed!');
         });
         let questionCount = 1; // Keeps track of the number of questions
@@ -462,6 +482,43 @@
             }
         }
 
+        function saveAndDisableEditing(questionCard) {
+            const questionTextElement = questionCard.querySelector('p'); // The <p> containing the question
+            const questionNumber = questionTextElement.querySelector('strong').textContent; // Keep the numbering intact
+            const questionInput = questionTextElement.querySelector('.edit-title-input'); // The input field for the question title
+
+            // Save the updated question title
+            if (questionInput) {
+                const newQuestionText = questionInput.value.trim();
+                questionTextElement.innerHTML = `<strong>${questionNumber}</strong> ${newQuestionText}`;
+            }
+
+            // Save the updated options and set the selected option
+            const options = questionCard.querySelectorAll('li'); // Get all option list items (li)
+            options.forEach(option => {
+                const optionInput = option.querySelector('.edit-option-input'); // The input field for the option text
+                if (optionInput) {
+                    const newOptionText = optionInput.value.trim();
+                    option.querySelector('.option-box').textContent = newOptionText; // Replace input with text
+                }
+
+                // Check if this option is currently selected (preselected)
+                if (option.classList.contains('preselected')) {
+                    option.classList.add('preselected'); // Keep this option selected
+                    option.classList.remove('disabled'); // Ensure it's active
+                } else {
+                    option.classList.add('disabled'); // Disable all other options
+                    option.classList.remove('preselected'); // Remove selection status from other options
+                }
+
+                option.style.cursor = 'not-allowed'; // Disable interaction for options after editing
+                option.removeEventListener('click', handleOptionSelect); // Remove click event for selecting option
+            });
+
+            // Remove the edit-specific cross icon
+            const editRemoveBtn = questionCard.querySelector('.edit-remove-btn');
+            if (editRemoveBtn) editRemoveBtn.remove();
+        }
         // Enable editing (make question and options editable)
         // Enable editing (make question and options editable)
         // Enable editing (make question and options editable)
@@ -531,42 +588,38 @@
             const questionNumber = questionTextElement.querySelector('strong').textContent; // Keep the numbering intact
             const questionInput = questionTextElement.querySelector('.edit-title-input'); // The input field for the question title
 
-            // Save the updated question text
+            // Revert the question title
             if (questionInput) {
-                const newQuestionText = questionInput.value.trim();
-                questionTextElement.innerHTML = `
-            <strong>${questionNumber}</strong> ${newQuestionText}
-        `;
+                const originalQuestionText = questionInput.defaultValue.trim(); // Revert to original value
+                questionTextElement.innerHTML = `<strong>${questionNumber}</strong> ${originalQuestionText}`;
             }
 
-            // Save the updated options and reapply "preselected" class
-            const options = questionCard.querySelectorAll('li'); // Get all option list items (li)
+            // Revert options to their original state
+            const options = questionCard.querySelectorAll('li'); // All option list items
             options.forEach(option => {
-                const optionInput = option.querySelector('.edit-option-input'); // Get input for the option
+                const optionInput = option.querySelector('.edit-option-input'); // The input field for the option text
                 if (optionInput) {
-                    const newOptionText = optionInput.value.trim();
-                    option.querySelector('.option-box').textContent = newOptionText; // Replace input with text
+                    const originalOptionText = optionInput.defaultValue.trim(); // Revert to original value
+                    option.querySelector('.option-box').textContent = originalOptionText; // Replace input with text
                 }
 
+                // Restore the option selection status (preselected/disabled)
                 if (option.classList.contains('preselected')) {
-                    option.classList.add('preselected'); // Ensure it stays preselected
-                    option.classList.remove('disabled'); // Remove "disabled" so the circle is blue
+                    option.classList.add('preselected'); // Restore the original preselected option
+                    option.classList.remove('disabled'); // Ensure it's not disabled
                 } else {
-                    option.classList.add('disabled'); // If not preselected, disable interaction
-                    option.classList.remove('preselected'); // Remove preselected from other options
+                    option.classList.add('disabled'); // Disable all other options
+                    option.classList.remove('preselected'); // Remove any selection status added during edit
                 }
 
-                option.style.cursor = 'not-allowed'; // Change cursor to not-allowed to prevent interaction
+                option.style.cursor = 'not-allowed'; // Disable interaction for options after editing
                 option.removeEventListener('click', handleOptionSelect); // Remove click event for selecting option
             });
 
             // Remove the edit-specific cross icon
             const editRemoveBtn = questionCard.querySelector('.edit-remove-btn');
-            if (editRemoveBtn) {
-                editRemoveBtn.remove();
-            }
+            if (editRemoveBtn) editRemoveBtn.remove();
         }
-
         // Remove question during Edit mode with confirmation
         function removeEditedQuestion(questionCard) {
             const questionItems = document.querySelectorAll('.question-item'); // Get all question cards
