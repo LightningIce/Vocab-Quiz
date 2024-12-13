@@ -466,6 +466,8 @@
         // Enable editing (make question and options editable)
         // Enable editing (make question and options editable)
         // Enable editing (make question and options editable)
+        // Enable editing (make question and options editable)
+        // Enable editing (make question and options editable)
         function enableEditing(questionCard) {
             const questionTextElement = questionCard.querySelector('p'); // The <p> containing the question
             const questionNumber = questionTextElement.querySelector('strong').textContent; // Keep the numbering intact
@@ -506,14 +508,21 @@
                 const currentOptionText = optionBox.textContent.trim(); // Get current text
                 optionBox.innerHTML = `<input type="text" value="${currentOptionText}" class="edit-option-input" />`; // Replace with input
 
-                option.addEventListener('click', function handleOptionSelect() {
-                    // Remove 'preselected' class from all options of this question
-                    options.forEach(opt => opt.classList.remove('preselected'));
-
-                    // Add 'preselected' to the clicked option
-                    option.classList.add('preselected');
-                });
+                // Add event listener for selecting option (only in edit mode)
+                option.addEventListener('click', handleOptionSelect);
             });
+        }
+
+        // Handle option selection (only in edit mode)
+        function handleOptionSelect(event) {
+            const option = event.currentTarget; // The clicked option (li)
+            const options = option.parentElement.querySelectorAll('li'); // All sibling options
+
+            // Remove 'preselected' class from all options of this question
+            options.forEach(opt => opt.classList.remove('preselected'));
+
+            // Add 'preselected' to the clicked option
+            option.classList.add('preselected');
         }
 
         // Disable editing (save changes and remove input fields)
@@ -539,7 +548,6 @@
                     option.querySelector('.option-box').textContent = newOptionText; // Replace input with text
                 }
 
-                // Check if this option was preselected, if so, mark it as preselected
                 if (option.classList.contains('preselected')) {
                     option.classList.add('preselected'); // Ensure it stays preselected
                     option.classList.remove('disabled'); // Remove "disabled" so the circle is blue
@@ -548,7 +556,8 @@
                     option.classList.remove('preselected'); // Remove preselected from other options
                 }
 
-                option.style.cursor = 'not-allowed'; // Change cursor to not-allowed
+                option.style.cursor = 'not-allowed'; // Change cursor to not-allowed to prevent interaction
+                option.removeEventListener('click', handleOptionSelect); // Remove click event for selecting option
             });
 
             // Remove the edit-specific cross icon
