@@ -94,6 +94,50 @@
             transform: translateY(-5px);
         }
 
+        .admin-dropdown {
+            display: none;
+            position: absolute;
+            background-color: #2c2c2c;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            border-radius: 4px;
+            padding: 10px 0;
+        }
+
+        .admin-dropdown a {
+            color: #f4f4f4;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.2s;
+        }
+
+        .admin-dropdown a:hover {
+            background-color: #575757;
+        }
+
+        .admin-dropdown-button {
+            background-color: #1e1e1e;
+            color: #f4f4f4;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .admin-dropdown-button::after {
+            content: '\25BC';
+            margin-left: 10px;
+            font-size: 12px;
+        }
+
+        .admin-dropdown-button.active {
+            background-color: #333333;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -144,6 +188,11 @@
             .admin-dashboard-container {
                 padding: 10px;
             }
+
+            .admin-dropdown-button {
+                width: 100%;
+                box-sizing: border-box;
+            }
         }
     </style>
 </head>
@@ -153,7 +202,6 @@
     <main>
         <div class="admin-dashboard-banner">Admin Dashboard</div>
         <div class="admin-dashboard-container">
-            <!-- Easy Category -->
             <div class="admin-level">
                 <div class="admin-dashboard-header">
                     <div class="admin-dashboard-title">Easy</div>
@@ -161,7 +209,6 @@
                 </div>
                 <div class="admin-quiz-container" data-category="Easy"></div>
             </div>
-            <!-- Hard Category -->
             <div class="admin-level">
                 <div class="admin-dashboard-header">
                     <div class="admin-dashboard-title">Hard</div>
@@ -169,7 +216,6 @@
                 </div>
                 <div class="admin-quiz-container" data-category="Hard"></div>
             </div>
-            <!-- Business Category -->
             <div class="admin-level">
                 <div class="admin-dashboard-header">
                     <div class="admin-dashboard-title">Business</div>
@@ -181,7 +227,6 @@
     </main>
     <?php include 'adminfooter.php'; ?>
 
-    <!-- Modal for Quiz Details -->
     <div id="quiz-modal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="modal-title">
         <div class="modal-content">
             <button class="close-button" aria-label="Close Modal">&times;</button>
@@ -190,160 +235,159 @@
         </div>
     </div>
 
-    <!-- JavaScript Embedded in the Same File -->
     <script>
-        // JavaScript to Render 5 Title-Only Quiz Buttons per Category
+        document.addEventListener('DOMContentLoaded', () => {
+            const dropdownButtons = document.querySelectorAll('.admin-dropdown-button');
+            const dropdownMenus = document.querySelectorAll('.admin-dropdown');
 
-        // Initial Quiz Data with Categories
-        const quizzes = [
-            {
-                id: 0,
-                title: "Daily Check-in",
-                category: "Easy"
-            },
-            {
-                id: 1,
-                title: "Gratitude Lesson - SEL (Inspired by Kenyecta Smith)",
-                category: "Easy"
-            },
-            {
-                id: 2,
-                title: "Math: 6th Grade (with new question types)",
-                category: "Hard"
-            },
-            {
-                id: 3,
-                title: "Science : 3rd Grade (with new question types)",
-                category: "Hard"
-            },
-            {
-                id: 4,
-                title: "Math: 3rd Grade (with new question types)",
-                category: "Business"
-            },
-            {
-                id: 5,
-                title: "Business Fundamentals",
-                category: "Business"
-            },
-            {
-                id: 6,
-                title: "Advanced Vocabulary in Business",
-                category: "Business"
-            },
-            {
-                id: 7,
-                title: "Financial Literacy Basics",
-                category: "Hard"
-            },
-            {
-                id: 8,
-                title: "Introduction to Economics",
-                category: "Easy"
-            },
-            {
-                id: 9,
-                title: "Strategic Management Concepts",
-                category: "Business"
-            }
-            // Add more quizzes as needed
-        ];
+            const toggleDropdown = (button, menu) => {
+                button.classList.toggle('active');
+                menu.classList.toggle('active');
+            };
 
-        function createQuizButton(quiz) {
-            const button = document.createElement('button');
-            button.classList.add('quiz-button');
-            button.setAttribute('aria-label', `Quiz: ${quiz.title}`);
-            button.textContent = quiz.title;
-
-            button.addEventListener('click', () => {
-                openModal(quiz);
-            });
-
-            return button;
-        }
-
-        function renderQuizzes() {
-            const quizContainers = document.querySelectorAll('.admin-quiz-container');
-
-            quizContainers.forEach(container => {
-                const category = container.getAttribute('data-category');
-
-                // Filter quizzes by category
-                const quizzesInCategory = quizzes.filter(quiz => quiz.category === category);
-
-                // Select the first 5 quizzes or all if fewer than 5
-                const quizzesToRender = quizzesInCategory.slice(0, 7);
-
-                // Clear existing content in the container
-                container.innerHTML = '';
-
-                // Create and append buttons for each quiz
-                quizzesToRender.forEach(quiz => {
-                    const quizButton = createQuizButton(quiz);
-                    container.appendChild(quizButton);
-                });
-
-                // Optional: Display a message if there are no quizzes
-                if (quizzesToRender.length === 0) {
-                    const noQuizzesMsg = document.createElement('p');
-                    noQuizzesMsg.textContent = 'No quizzes available in this category.';
-                    noQuizzesMsg.style.color = '#ccc';
-                    container.appendChild(noQuizzesMsg);
+            dropdownButtons.forEach((button, index) => {
+                const menu = dropdownMenus[index];
+                if (button && menu) {
+                    button.addEventListener('click', (event) => {
+                        event.stopPropagation();
+                        toggleDropdown(button, menu);
+                    });
                 }
             });
-        }
 
-        // Function to open modal with quiz details
-        function openModal(quiz) {
-            const modal = document.getElementById('quiz-modal');
-            const modalTitle = document.getElementById('modal-title');
-            const modalDescription = document.getElementById('modal-description');
+            document.addEventListener('click', () => {
+                dropdownButtons.forEach((button, index) => {
+                    const menu = dropdownMenus[index];
+                    if (button.classList.contains('active')) {
+                        button.classList.remove('active');
+                        menu.classList.remove('active');
+                    }
+                });
+            });
 
-            modalTitle.textContent = quiz.title;
-            // Add more details as needed
-            modalDescription.textContent = `This is the "${quiz.title}" quiz. More details can be added here.`;
+            const quizzes = [
+                {
+                    id: 0,
+                    title: "Daily Check-in",
+                    category: "Easy"
+                },
+                {
+                    id: 1,
+                    title: "Gratitude Lesson - SEL (Inspired by Kenyecta Smith)",
+                    category: "Easy"
+                },
+                {
+                    id: 2,
+                    title: "Math: 6th Grade (with new question types)",
+                    category: "Hard"
+                },
+                {
+                    id: 3,
+                    title: "Science : 3rd Grade (with new question types)",
+                    category: "Hard"
+                },
+                {
+                    id: 4,
+                    title: "Math: 3rd Grade (with new question types)",
+                    category: "Business"
+                },
+                {
+                    id: 5,
+                    title: "Business Fundamentals",
+                    category: "Business"
+                },
+                {
+                    id: 6,
+                    title: "Advanced Vocabulary in Business",
+                    category: "Business"
+                },
+                {
+                    id: 7,
+                    title: "Financial Literacy Basics",
+                    category: "Hard"
+                },
+                {
+                    id: 8,
+                    title: "Introduction to Economics",
+                    category: "Easy"
+                },
+                {
+                    id: 9,
+                    title: "Strategic Management Concepts",
+                    category: "Business"
+                }
+            ];
 
-            modal.style.display = 'block';
-            modal.setAttribute('aria-hidden', 'false');
-
-            // Set focus to the modal for accessibility
-            modal.querySelector('.close-button').focus();
-        }
-
-        // Function to close modal
-        function closeModal() {
-            const modal = document.getElementById('quiz-modal');
-            modal.style.display = 'none';
-            modal.setAttribute('aria-hidden', 'true');
-
-            // Return focus to the body or a specific element
-            document.body.focus();
-        }
-
-        // Event listener for closing the modal
-        const closeButton = document.querySelector('.close-button');
-        if (closeButton) {
-            closeButton.addEventListener('click', closeModal);
-        }
-
-        // Close modal when clicking outside the modal content
-        window.addEventListener('click', (event) => {
-            const modal = document.getElementById('quiz-modal');
-            if (event.target == modal) {
-                closeModal();
+            function createQuizButton(quiz) {
+                const button = document.createElement('button');
+                button.classList.add('quiz-button');
+                button.setAttribute('aria-label', `Quiz: ${quiz.title}`);
+                button.textContent = quiz.title;
+                button.addEventListener('click', () => {
+                    openModal(quiz);
+                });
+                return button;
             }
-        });
 
-        // Close modal with 'Escape' key for accessibility
-        window.addEventListener('keydown', (event) => {
-            const modal = document.getElementById('quiz-modal');
-            if (event.key === 'Escape' && modal.style.display === 'block') {
-                closeModal();
+            function renderQuizzes() {
+                const quizContainers = document.querySelectorAll('.admin-quiz-container');
+                quizContainers.forEach(container => {
+                    const category = container.getAttribute('data-category');
+                    const quizzesInCategory = quizzes.filter(quiz => quiz.category === category);
+                    const quizzesToRender = quizzesInCategory.slice(0, 5);
+                    container.innerHTML = '';
+                    quizzesToRender.forEach(quiz => {
+                        const quizButton = createQuizButton(quiz);
+                        container.appendChild(quizButton);
+                    });
+                    if (quizzesToRender.length === 0) {
+                        const noQuizzesMsg = document.createElement('p');
+                        noQuizzesMsg.textContent = 'No quizzes available in this category.';
+                        noQuizzesMsg.style.color = '#ccc';
+                        container.appendChild(noQuizzesMsg);
+                    }
+                });
             }
-        });
 
-        // Initialize rendering when DOM is fully loaded
-        document.addEventListener('DOMContentLoaded', renderQuizzes);
+            function openModal(quiz) {
+                const modal = document.getElementById('quiz-modal');
+                const modalTitle = document.getElementById('modal-title');
+                const modalDescription = document.getElementById('modal-description');
+                modalTitle.textContent = quiz.title;
+                modalDescription.textContent = `Details about the "${quiz.title}" quiz can be displayed here.`;
+                modal.style.display = 'block';
+                modal.setAttribute('aria-hidden', 'false');
+                modal.querySelector('.close-button').focus();
+            }
+
+            function closeModal() {
+                const modal = document.getElementById('quiz-modal');
+                modal.style.display = 'none';
+                modal.setAttribute('aria-hidden', 'true');
+                document.body.focus();
+            }
+
+            const closeButton = document.querySelector('.close-button');
+            if (closeButton) {
+                closeButton.addEventListener('click', closeModal);
+            }
+
+            window.addEventListener('click', (event) => {
+                const modal = document.getElementById('quiz-modal');
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+
+            window.addEventListener('keydown', (event) => {
+                const modal = document.getElementById('quiz-modal');
+                if (event.key === 'Escape' && modal.style.display === 'block') {
+                    closeModal();
+                }
+            });
+
+            renderQuizzes();
+        });
     </script>
 </body>
 
