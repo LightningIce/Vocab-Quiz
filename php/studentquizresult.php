@@ -96,18 +96,35 @@ header .name {
 <body>
 <header>
     <div class="name">
-    <img src="images/logo3.png" alt="Logo" class="logo-img">    
+    <img src="logo3.png" alt="Logo" class="logo-img">    
     Vocab Quiz</div>
-    <img src="images/profile2.png" alt="profile" class="profile-img">
+    <img src="profile2.png" alt="profile" class="profile-img">
     </header>
-    <img src="images/easy.png" alt="easy" class="easy-img">
+    <img src="easy.png" alt="easy" class="easy-img">
     <div class="Result">
         <h1>Final Result:</h1>
-        <h2>35/40</h2>
+        <h2 id="score-display"></h2>
     </div>
     <div class="choices">
-        <button class="choice">Review Question</button>  
-        <button class="choice">Exit</button>
+        <button class=".choice" onclick="reviewQuestions()">Review Question</button>  
+        <button class=".choice" onclick="exitQuiz()">Exit</button>
     </div>
+    <script>
+        //extract past variable
+        const urlParams = new URLSearchParams(window.location.search);
+        const score =urlParams.get('score');
+        const passed = urlParams.get('passed');
+
+        //update result
+        document.getElementById('score-display').textContent = score ? `${score}/100` : "0/100";
+
+        function reviewQuestions() {
+            window.location.href = "review.html";
+        }
+
+        function exitQuiz() {
+            window.location.href = "index.html";
+        }
+    </script>
 </body>
 </html>
