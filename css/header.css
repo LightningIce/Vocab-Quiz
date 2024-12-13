@@ -14,12 +14,13 @@ body, ul, li, a, img {
     display: flex;
     padding: 0px 20px;
     height: 80px;
+    width: 100%;
 }
 
 .nav-wrap {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    width: 100%;
 }
 /* Logo Section */
 #header-logo {
@@ -45,6 +46,7 @@ body, ul, li, a, img {
 #header-navigation ul {
     display: flex;
     height: 80px;
+    justify-content: flex-end;
 }
 
 #header-navigation ul li {
@@ -69,19 +71,21 @@ body, ul, li, a, img {
 }
 
 /* Create Quiz Button */
-#header-new-quiz .header-create-button a {
-    background-color: #1db954; /* Spotify Green for the button */
-    color: #121212;
+.header-create-button a {
+    background-color: #176c35; /* Spotify Green for the button */
+    color: #e0e0e0;
     font-size: 14px;
     font-weight: bold;
     padding: 8px 16px;
     border-radius: 5px;
     transition: background-color 0.3s, color 0.3s;
+    align-content: flex-end;
+
 }
 
-#header-new-quiz .header-create-button a:hover {
+.header-create-button a:hover {
     background-color: #1ed760; /* Slightly lighter green */
-    color: #ffffff; /* White text on hover */
+    color: #000000; 
 }
 
 /* Admin Dropdown */
