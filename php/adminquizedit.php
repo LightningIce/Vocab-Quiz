@@ -319,6 +319,20 @@
             color: #ff5555;
             /* Lighter red on hover */
         }
+
+        /* Edit Title Icon Styles */
+        .edit-title-btn {
+            background: none;
+            border: none;
+            color: #2196F3;
+            font-size: 20px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .edit-title-btn:hover {
+            color: #42a5f5;
+        }
     </style>
 </head>
 
@@ -337,9 +351,13 @@
         <div class="container">
             <!-- Quiz Info Section -->
             <div class="quiz-info">
-                <h2>Business Terms Beginner Level Quiz 1</h2>
+                <h2 id="quiz-title">
+                    Business Terms Beginner Level Quiz 1
+                    <button id="edit-title-btn" class="edit-title-btn">✏️</button>
+                </h2>
                 <p>Total questions (1)</p>
             </div>
+
 
             <!-- Single Question -->
             <div class="questions-container" id="questions-container">
@@ -712,6 +730,105 @@
             // Update the question numbers and total questions
             updateQuestionNumbers();
         }
+        // Function to save the quiz title
+        // Function to save the quiz title
+        // Function to save the quiz title
+        // Function to save the quiz title
+        // Function to save the quiz title
+        // Initialize quiz title edit functionality
+        // Initialize quiz title edit functionality
+        function initializeTitleEdit() {
+            const quizTitleElement = document.querySelector('.quiz-info h2'); // Quiz title container
+
+            // Remove any previously added edit button if it exists
+            const existingEditButton = document.querySelector('#edit-title-btn');
+            if (existingEditButton) {
+                existingEditButton.remove();
+            }
+
+            // Create the edit icon
+            const editIcon = document.createElement('button');
+            editIcon.id = 'edit-title-btn';
+            editIcon.classList.add('edit-title-btn');
+            editIcon.textContent = '✏️'; // Icon for edit
+            editIcon.title = 'Edit title';
+            editIcon.style.marginLeft = '10px'; // Align icon next to title
+            editIcon.style.cursor = 'pointer'; // Pointer cursor for interactivity
+            editIcon.style.border = 'none'; // Clean button styling
+            editIcon.style.background = 'transparent'; // Transparent background
+
+            // Append the edit icon next to the title
+            quizTitleElement.appendChild(editIcon);
+
+            // Function to handle entering edit mode
+            function enterEditMode() {
+                const currentTitle = quizTitleElement.querySelector('span')?.textContent || 'Untitled Quiz';
+
+                // Clear existing content
+                quizTitleElement.innerHTML = '';
+
+                // Create an input field for editing the title
+                const titleInput = document.createElement('input');
+                titleInput.type = 'text';
+                titleInput.id = 'title-input';
+                titleInput.value = currentTitle;
+                titleInput.placeholder = 'Enter quiz title...';
+                titleInput.classList.add('title-edit-input');
+                titleInput.style.width = '80%'; // Ensure the input fits within the container
+                titleInput.style.padding = '5px'; // Add padding for better UX
+                titleInput.style.fontSize = '16px'; // Match title size
+                titleInput.style.marginRight = '10px'; // Space for the tick icon
+
+                // Append the input to the title container
+                quizTitleElement.appendChild(titleInput);
+
+                // Automatically focus the input field
+                titleInput.focus();
+
+                // Change the icon to a save (tick) icon
+                editIcon.textContent = '✔️'; // Tick icon for saving
+                editIcon.title = 'Save title';
+
+                // Save the new title on "Enter" key press
+                titleInput.addEventListener('keydown', (event) => {
+                    if (event.key === 'Enter') {
+                        saveTitle();
+                    }
+                });
+
+                // Reassign the icon click to save the title
+                editIcon.onclick = saveTitle;
+            }
+
+            // Function to save the quiz title
+            function saveTitle() {
+                const titleInput = document.getElementById('title-input');
+                if (!titleInput) return;
+
+                const newTitle = titleInput.value.trim() || 'Untitled Quiz';
+
+                // Clear the container and restore the title
+                quizTitleElement.innerHTML = '';
+
+                const titleSpan = document.createElement('span');
+                titleSpan.textContent = newTitle; // Save the new title
+                quizTitleElement.appendChild(titleSpan);
+
+                // Restore the edit icon
+                quizTitleElement.appendChild(editIcon);
+                editIcon.textContent = '✏️'; // Back to edit icon
+                editIcon.title = 'Edit title';
+
+                // Reassign the icon click to enter edit mode
+                editIcon.onclick = enterEditMode;
+            }
+
+            // Assign the initial click to enter edit mode
+            editIcon.onclick = enterEditMode;
+        }
+
+        // Call the initialize function on page load
+        initializeTitleEdit();
     </script>
 </body>
 
