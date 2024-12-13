@@ -13,7 +13,15 @@
                     <li class="nav-business"><a href="admindashboardbusiness.php"><span>Business</span></a></li>
                 </ul>
             </div>
-            <div id="header-new-quiz"><div class="header-create-button"><a href="adminquizadd.php"></a></div></div>
+            <div id="header-create-quiz">
+                <div class="header-create-button"><a href="adminquizadd.php"></a></div>
+            </div>
+            <div class="admin-dropdown">
+                <ul class="admin-dropdown-items">
+                    <li><a href="allaccount.php"><span>Profile</span></a></li>
+                    <li><a href="alllogin.php"><span>Log Out</span></a></li>
+                </ul>
+            </div>
         </div>
     </nav>
 </header>
