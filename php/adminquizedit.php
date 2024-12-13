@@ -463,6 +463,9 @@
         }
 
         // Enable editing (make question and options editable)
+        // Enable editing (make question and options editable)
+        // Enable editing (make question and options editable)
+        // Enable editing (make question and options editable)
         function enableEditing(questionCard) {
             const questionTextElement = questionCard.querySelector('p'); // The <p> containing the question
             const questionNumber = questionTextElement.querySelector('strong').textContent; // Keep the numbering intact
@@ -493,15 +496,27 @@
                 questionCard.appendChild(removeBtn);
             }
 
-            // Make the options editable
-            const options = questionCard.querySelectorAll('.option-box'); // Options
+            // Enable option selection and editing
+            const options = questionCard.querySelectorAll('li'); // Get all option list items (li)
             options.forEach(option => {
-                const currentOption = option.textContent.trim();
-                option.innerHTML = `<input type="text" value="${currentOption}" class="edit-option-input" />`;
+                option.classList.remove('disabled'); // Remove "disabled" to allow user interaction
+                option.style.cursor = 'pointer'; // Change cursor to pointer to show it's clickable
+
+                const optionBox = option.querySelector('.option-box'); // Option box to allow editing
+                const currentOptionText = optionBox.textContent.trim(); // Get current text
+                optionBox.innerHTML = `<input type="text" value="${currentOptionText}" class="edit-option-input" />`; // Replace with input
+
+                option.addEventListener('click', function handleOptionSelect() {
+                    // Remove 'preselected' class from all options of this question
+                    options.forEach(opt => opt.classList.remove('preselected'));
+
+                    // Add 'preselected' to the clicked option
+                    option.classList.add('preselected');
+                });
             });
         }
 
-        // Disable editing (save changes to question text and options)
+        // Disable editing (save changes and remove input fields)
         function disableEditing(questionCard) {
             const questionTextElement = questionCard.querySelector('p'); // The <p> containing the question
             const questionNumber = questionTextElement.querySelector('strong').textContent; // Keep the numbering intact
@@ -515,11 +530,25 @@
         `;
             }
 
-            // Save the updated options
-            const optionInputs = questionCard.querySelectorAll('.edit-option-input'); // Option inputs
-            optionInputs.forEach(input => {
-                const newOption = input.value.trim();
-                input.parentElement.textContent = newOption;
+            // Save the updated options and reapply "preselected" class
+            const options = questionCard.querySelectorAll('li'); // Get all option list items (li)
+            options.forEach(option => {
+                const optionInput = option.querySelector('.edit-option-input'); // Get input for the option
+                if (optionInput) {
+                    const newOptionText = optionInput.value.trim();
+                    option.querySelector('.option-box').textContent = newOptionText; // Replace input with text
+                }
+
+                // Check if this option was preselected, if so, mark it as preselected
+                if (option.classList.contains('preselected')) {
+                    option.classList.add('preselected'); // Ensure it stays preselected
+                    option.classList.remove('disabled'); // Remove "disabled" so the circle is blue
+                } else {
+                    option.classList.add('disabled'); // If not preselected, disable interaction
+                    option.classList.remove('preselected'); // Remove preselected from other options
+                }
+
+                option.style.cursor = 'not-allowed'; // Change cursor to not-allowed
             });
 
             // Remove the edit-specific cross icon
@@ -550,10 +579,18 @@
             const questionItems = document.querySelectorAll('.question-item'); // Get all question cards
             questionItems.forEach((question, index) => {
                 const questionNumberElement = question.querySelector('p strong'); // The <strong> element for numbering
-                questionNumberElement.textContent = `${index + 1}.`; // Update numbering (1, 2, 3, ...)
+                questionNumberElement.textContent = `${index + 1}.`; // Update numbering (1, 2, 3, ... )
             });
             updateTotalQuestions(); // Always update total questions after numbering
         }
+
+        // Function to update the total number of questions shown
+        function updateTotalQuestions() {
+            const totalQuestionsCount = document.querySelectorAll('.question-item').length; // Count the question items
+            const totalQuestionsElement = document.querySelector('.quiz-info p'); // The paragraph showing total questions
+            totalQuestionsElement.textContent = `Total questions (${totalQuestionsCount})`; // Update the text
+        }
+
 
         // Function to add a new question
         function addNewQuestion(formId) {
