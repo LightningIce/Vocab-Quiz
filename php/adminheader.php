@@ -5,17 +5,17 @@
         <!-- Logo Section -->
         <div id="header-logo">
             <div class="header-logo-cat">
-                <a href="adminhome.php"><img src="../images/icon.png" alt="Logo"></a>
+                <a href="admindashboard.php"><img src="../images/icon.png" alt="Logo"></a>
             </div>
             <div class="header-logo-name">
-                <a href="adminhome.php">Vocab Quiz</a>
+                <a href="admindashboard.php">Vocab Quiz</a>
             </div>
         </div>
 
         <!-- Navigation Links -->
         <div id="header-navigation">
             <ul>
-                <li class="nav-home"><a href="adminhome.php"><span>Home</span></a></li>
+                <li class="nav-home"><a href="admindashboard.php"><span>Home</span></a></li>
                 <li class="nav-easy"><a href="admindashboardeasy.php"><span>Easy</span></a></li>
                 <li class="nav-hard"><a href="admindashboardhard.php"><span>Hard</span></a></li>
                 <li class="nav-business"><a href="admindashboardbusiness.php"><span>Business</span></a></li>
