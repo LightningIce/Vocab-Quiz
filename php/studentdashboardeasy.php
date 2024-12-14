@@ -161,6 +161,33 @@
             color: #000;
         }
 
+        .modal-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.modal-button {
+    background-color: #1e1e1e;
+    color: #f4f4f4;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.modal-button:hover,
+.modal-button:focus {
+    background-color: #333333;
+    color: #ffffff;
+    outline: none;
+    transform: translateY(-2px);
+}
+
+
         .close-button {
             color: #aaa;
             position: absolute;
@@ -218,6 +245,11 @@
             <button class="close-button" aria-label="Close Modal">&times;</button>
             <h2 id="modal-title">Quiz Title</h2>
             <p id="modal-description">Quiz Description</p>
+
+            <!-- New Buttons -->
+            <div class="modal-actions">
+                <button class="modal-button review-edit" aria-label="Take Quiz">Take Quiz</button>
+            </div>
         </div>
     </div>
 

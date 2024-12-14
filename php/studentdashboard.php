@@ -16,6 +16,7 @@
             background-color: #121212;
             color: #f4f4f4;
         }
+
         .admin-dashboard-banner {
             background-color: rgb(57, 57, 57);
             color: rgb(255, 255, 255);
@@ -25,20 +26,24 @@
             font-weight: bold;
             width: 100%;
         }
+
         .admin-dashboard-container {
             box-sizing: border-box;
             padding: 20px;
         }
+
         .admin-level {
             box-sizing: border-box;
             margin-bottom: 40px;
         }
+
         .admin-dashboard-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
         }
+
         .admin-dashboard-title {
             color: #ffffff;
             align-items: center;
@@ -46,21 +51,25 @@
             font-weight: 600;
             display: flex;
         }
+
         .admin-dashboard-see-more a {
             color: #1e90ff;
             text-decoration: none;
             font-size: 16px;
             transition: color 0.3s;
         }
+
         .admin-dashboard-see-more a:hover {
             color: #63a4ff;
         }
+
         .admin-quiz-container {
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
             justify-content: flex-start;
         }
+
         .quiz-button {
             background-color: #1e1e1e;
             color: #f4f4f4;
@@ -76,6 +85,7 @@
             word-wrap: break-word;
             height: auto;
         }
+
         .quiz-button:hover,
         .quiz-button:focus {
             background-color: #333333;
@@ -83,16 +93,18 @@
             outline: none;
             transform: translateY(-5px);
         }
+
         .admin-dropdown {
             display: none;
             position: absolute;
             background-color: #2c2c2c;
             min-width: 160px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
             z-index: 1;
             border-radius: 4px;
             padding: 10px 0;
         }
+
         .admin-dropdown a {
             color: #f4f4f4;
             padding: 12px 16px;
@@ -100,9 +112,11 @@
             display: block;
             transition: background-color 0.2s;
         }
+
         .admin-dropdown a:hover {
             background-color: #575757;
         }
+
         .admin-dropdown-button {
             background-color: #1e1e1e;
             color: #f4f4f4;
@@ -113,14 +127,17 @@
             border-radius: 4px;
             position: relative;
         }
+
         .admin-dropdown-button::after {
             content: '\25BC';
             margin-left: 10px;
             font-size: 12px;
         }
+
         .admin-dropdown-button.active {
             background-color: #333333;
         }
+
         .modal {
             display: none;
             position: fixed;
@@ -132,6 +149,7 @@
             overflow: auto;
             background-color: rgba(0, 0, 0, 0.5);
         }
+
         .modal-content {
             background-color: #fefefe;
             margin: 10% auto;
@@ -142,6 +160,34 @@
             position: relative;
             color: #000;
         }
+
+        .modal-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.modal-button {
+    background-color: #1e1e1e;
+    color: #f4f4f4;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.modal-button:hover,
+.modal-button:focus {
+    background-color: #333333;
+    color: #ffffff;
+    outline: none;
+    transform: translateY(-2px);
+}
+
+
         .close-button {
             color: #aaa;
             position: absolute;
@@ -153,19 +199,23 @@
             border: none;
             cursor: pointer;
         }
+
         .close-button:hover,
         .close-button:focus {
             color: black;
             text-decoration: none;
             outline: none;
         }
+
         @media (max-width: 600px) {
             .quiz-button {
                 width: 100%;
             }
+
             .admin-dashboard-container {
                 padding: 10px;
             }
+
             .admin-dropdown-button {
                 width: 100%;
                 box-sizing: border-box;
@@ -173,6 +223,7 @@
         }
     </style>
 </head>
+
 <body>
     <?php include 'studentheader.php'; ?>
     <main>
@@ -208,8 +259,14 @@
             <button class="close-button" aria-label="Close Modal">&times;</button>
             <h2 id="modal-title">Quiz Title</h2>
             <p id="modal-description">Quiz Description</p>
+
+            <!-- New Buttons -->
+            <div class="modal-actions">
+                <button class="modal-button review-edit" aria-label="Take Quiz">Take Quiz</button>
+            </div>
         </div>
     </div>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -237,18 +294,58 @@
                     }
                 });
             });
-            const quizzes = [
-                { id: 0, title: "Daily Check-in", category: "Easy" },
-                { id: 1, title: "Gratitude Lesson - SEL (Inspired by Kenyecta Smith)", category: "Easy" },
-                { id: 2, title: "Math: 6th Grade (with new question types)", category: "Hard" },
-                { id: 3, title: "Science : 3rd Grade (with new question types)", category: "Hard" },
-                { id: 4, title: "Math: 3rd Grade (with new question types)", category: "Business" },
-                { id: 5, title: "Business Fundamentals", category: "Business" },
-                { id: 6, title: "Advanced Vocabulary in Business", category: "Business" },
-                { id: 7, title: "Financial Literacy Basics", category: "Hard" },
-                { id: 8, title: "Introduction to Economics", category: "Easy" },
-                { id: 9, title: "Strategic Management Concepts", category: "Business" }
+            const quizzes = [{
+                    id: 0,
+                    title: "Daily Check-in",
+                    category: "Easy"
+                },
+                {
+                    id: 1,
+                    title: "Gratitude Lesson - SEL (Inspired by Kenyecta Smith)",
+                    category: "Easy"
+                },
+                {
+                    id: 2,
+                    title: "Math: 6th Grade (with new question types)",
+                    category: "Hard"
+                },
+                {
+                    id: 3,
+                    title: "Science : 3rd Grade (with new question types)",
+                    category: "Hard"
+                },
+                {
+                    id: 4,
+                    title: "Math: 3rd Grade (with new question types)",
+                    category: "Business"
+                },
+                {
+                    id: 5,
+                    title: "Business Fundamentals",
+                    category: "Business"
+                },
+                {
+                    id: 6,
+                    title: "Advanced Vocabulary in Business",
+                    category: "Business"
+                },
+                {
+                    id: 7,
+                    title: "Financial Literacy Basics",
+                    category: "Hard"
+                },
+                {
+                    id: 8,
+                    title: "Introduction to Economics",
+                    category: "Easy"
+                },
+                {
+                    id: 9,
+                    title: "Strategic Management Concepts",
+                    category: "Business"
+                }
             ];
+
             function createQuizButton(quiz) {
                 const button = document.createElement('button');
                 button.classList.add('quiz-button');
@@ -259,6 +356,7 @@
                 });
                 return button;
             }
+
             function renderQuizzes() {
                 const quizContainers = document.querySelectorAll('.admin-quiz-container');
                 quizContainers.forEach(container => {
@@ -278,6 +376,7 @@
                     }
                 });
             }
+
             function openModal(quiz) {
                 const modal = document.getElementById('quiz-modal');
                 const modalTitle = document.getElementById('modal-title');
@@ -288,6 +387,7 @@
                 modal.setAttribute('aria-hidden', 'false');
                 modal.querySelector('.close-button').focus();
             }
+
             function closeModal() {
                 const modal = document.getElementById('quiz-modal');
                 modal.style.display = 'none';
@@ -314,4 +414,5 @@
         });
     </script>
 </body>
+
 </html>
