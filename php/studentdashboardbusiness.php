@@ -4,8 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Vocab Quiz Dashboard for Students">
-    <title>Student Quiz Dashboard</title>
+    <title>Business Quizzes Dashboard (Students)</title>
     <link rel="stylesheet" href="../css/adminheader.css">
     <link rel="stylesheet" href="../css/font-awesome.css">
     <style>
@@ -16,6 +15,7 @@
             background-color: #121212;
             color: #f4f4f4;
         }
+
         .admin-dashboard-banner {
             background-color: rgb(57, 57, 57);
             color: rgb(255, 255, 255);
@@ -25,20 +25,24 @@
             font-weight: bold;
             width: 100%;
         }
+
         .admin-dashboard-container {
             box-sizing: border-box;
             padding: 20px;
         }
+
         .admin-level {
             box-sizing: border-box;
             margin-bottom: 40px;
         }
+
         .admin-dashboard-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
         }
+
         .admin-dashboard-title {
             color: #ffffff;
             align-items: center;
@@ -46,21 +50,25 @@
             font-weight: 600;
             display: flex;
         }
+
         .admin-dashboard-see-more a {
             color: #1e90ff;
             text-decoration: none;
             font-size: 16px;
             transition: color 0.3s;
         }
+
         .admin-dashboard-see-more a:hover {
             color: #63a4ff;
         }
+
         .admin-quiz-container {
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
             justify-content: flex-start;
         }
+
         .quiz-button {
             background-color: #1e1e1e;
             color: #f4f4f4;
@@ -76,6 +84,7 @@
             word-wrap: break-word;
             height: auto;
         }
+
         .quiz-button:hover,
         .quiz-button:focus {
             background-color: #333333;
@@ -83,16 +92,18 @@
             outline: none;
             transform: translateY(-5px);
         }
+
         .admin-dropdown {
             display: none;
             position: absolute;
             background-color: #2c2c2c;
             min-width: 160px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
             z-index: 1;
             border-radius: 4px;
             padding: 10px 0;
         }
+
         .admin-dropdown a {
             color: #f4f4f4;
             padding: 12px 16px;
@@ -100,9 +111,11 @@
             display: block;
             transition: background-color 0.2s;
         }
+
         .admin-dropdown a:hover {
             background-color: #575757;
         }
+
         .admin-dropdown-button {
             background-color: #1e1e1e;
             color: #f4f4f4;
@@ -113,14 +126,17 @@
             border-radius: 4px;
             position: relative;
         }
+
         .admin-dropdown-button::after {
             content: '\25BC';
             margin-left: 10px;
             font-size: 12px;
         }
+
         .admin-dropdown-button.active {
             background-color: #333333;
         }
+
         .modal {
             display: none;
             position: fixed;
@@ -132,6 +148,7 @@
             overflow: auto;
             background-color: rgba(0, 0, 0, 0.5);
         }
+
         .modal-content {
             background-color: #fefefe;
             margin: 10% auto;
@@ -142,6 +159,7 @@
             position: relative;
             color: #000;
         }
+
         .close-button {
             color: #aaa;
             position: absolute;
@@ -153,19 +171,23 @@
             border: none;
             cursor: pointer;
         }
+
         .close-button:hover,
         .close-button:focus {
             color: black;
             text-decoration: none;
             outline: none;
         }
-        @media (max-width: 600px) {
+
+        @media (max-width:600px) {
             .quiz-button {
                 width: 100%;
             }
+
             .admin-dashboard-container {
                 padding: 10px;
             }
+
             .admin-dropdown-button {
                 width: 100%;
                 box-sizing: border-box;
@@ -173,29 +195,16 @@
         }
     </style>
 </head>
+
 <body>
     <?php include 'studentheader.php'; ?>
     <main>
-        <div class="admin-dashboard-banner">Student Main Dashboard</div>
+        <div class="admin-dashboard-banner">Business Quizzes Dashboard (Students)</div>
         <div class="admin-dashboard-container">
             <div class="admin-level">
                 <div class="admin-dashboard-header">
-                    <div class="admin-dashboard-title">Easy</div>
-                    <div class="admin-dashboard-see-more"><a href="studentdashboardeasy.php">See More</a></div>
-                </div>
-                <div class="admin-quiz-container" data-category="Easy"></div>
-            </div>
-            <div class="admin-level">
-                <div class="admin-dashboard-header">
-                    <div class="admin-dashboard-title">Hard</div>
-                    <div class="admin-dashboard-see-more"><a href="studentdashboardhard.php">See More</a></div>
-                </div>
-                <div class="admin-quiz-container" data-category="Hard"></div>
-            </div>
-            <div class="admin-level">
-                <div class="admin-dashboard-header">
-                    <div class="admin-dashboard-title">Business</div>
-                    <div class="admin-dashboard-see-more"><a href="studentdashboardbusiness.php">See More</a></div>
+                    <div class="admin-dashboard-title">Business Quizzes</div>
+                    <div class="admin-dashboard-see-more"><a href="studentdashboard.php">Back to Student Main Dashboard</a></div>
                 </div>
                 <div class="admin-quiz-container" data-category="Business"></div>
             </div>
@@ -237,18 +246,43 @@
                     }
                 });
             });
-            const quizzes = [
-                { id: 0, title: "Daily Check-in", category: "Easy" },
-                { id: 1, title: "Gratitude Lesson - SEL (Inspired by Kenyecta Smith)", category: "Easy" },
-                { id: 2, title: "Math: 6th Grade (with new question types)", category: "Hard" },
-                { id: 3, title: "Science : 3rd Grade (with new question types)", category: "Hard" },
-                { id: 4, title: "Math: 3rd Grade (with new question types)", category: "Business" },
-                { id: 5, title: "Business Fundamentals", category: "Business" },
-                { id: 6, title: "Advanced Vocabulary in Business", category: "Business" },
-                { id: 7, title: "Financial Literacy Basics", category: "Hard" },
-                { id: 8, title: "Introduction to Economics", category: "Easy" },
-                { id: 9, title: "Strategic Management Concepts", category: "Business" }
+            const quizzes = [{
+                    id: 4,
+                    title: "Business Strategy Basics",
+                    category: "Business"
+                },
+                {
+                    id: 5,
+                    title: "Corporate Finance Essentials",
+                    category: "Business"
+                },
+                {
+                    id: 6,
+                    title: "Advanced Marketing Techniques",
+                    category: "Business"
+                },
+                {
+                    id: 9,
+                    title: "Strategic Management Concepts",
+                    category: "Business"
+                },
+                {
+                    id: 12,
+                    title: "Marketing Strategies",
+                    category: "Business"
+                },
+                {
+                    id: 13,
+                    title: "Corporate Finance Basics",
+                    category: "Business"
+                },
+                {
+                    id: 14,
+                    title: "Entrepreneurship Essentials",
+                    category: "Business"
+                }
             ];
+
             function createQuizButton(quiz) {
                 const button = document.createElement('button');
                 button.classList.add('quiz-button');
@@ -259,18 +293,18 @@
                 });
                 return button;
             }
+
             function renderQuizzes() {
                 const quizContainers = document.querySelectorAll('.admin-quiz-container');
                 quizContainers.forEach(container => {
                     const category = container.getAttribute('data-category');
                     const quizzesInCategory = quizzes.filter(quiz => quiz.category === category);
-                    const quizzesToRender = quizzesInCategory.slice(0, 5);
                     container.innerHTML = '';
-                    quizzesToRender.forEach(quiz => {
+                    quizzesInCategory.forEach(quiz => {
                         const quizButton = createQuizButton(quiz);
                         container.appendChild(quizButton);
                     });
-                    if (quizzesToRender.length === 0) {
+                    if (quizzesInCategory.length === 0) {
                         const noQuizzesMsg = document.createElement('p');
                         noQuizzesMsg.textContent = 'No quizzes available in this category.';
                         noQuizzesMsg.style.color = '#ccc';
@@ -278,6 +312,7 @@
                     }
                 });
             }
+
             function openModal(quiz) {
                 const modal = document.getElementById('quiz-modal');
                 const modalTitle = document.getElementById('modal-title');
@@ -288,6 +323,7 @@
                 modal.setAttribute('aria-hidden', 'false');
                 modal.querySelector('.close-button').focus();
             }
+
             function closeModal() {
                 const modal = document.getElementById('quiz-modal');
                 modal.style.display = 'none';
@@ -314,4 +350,5 @@
         });
     </script>
 </body>
+
 </html>
