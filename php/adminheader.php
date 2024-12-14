@@ -1,7 +1,8 @@
+<!-- Include Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
 <header class="admin-header">
-    <div class="nav-wrap" id="nav-border-hack">
+    <div class="nav-wrap">
         <!-- Logo Section -->
         <div id="header-logo">
             <div class="header-logo-cat">
@@ -13,14 +14,14 @@
         </div>
 
         <!-- Navigation Links -->
-        <div id="header-navigation">
+        <nav id="header-navigation">
             <ul>
                 <li class="nav-home"><a href="admindashboard.php"><span>Home</span></a></li>
                 <li class="nav-easy"><a href="admindashboardeasy.php"><span>Easy</span></a></li>
                 <li class="nav-hard"><a href="admindashboardhard.php"><span>Hard</span></a></li>
                 <li class="nav-business"><a href="admindashboardbusiness.php"><span>Business</span></a></li>
             </ul>
-        </div>
+        </nav>
 
         <!-- Create Quiz Button -->
         <div id="header-create-quiz">
