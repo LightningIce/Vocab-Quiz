@@ -1,3 +1,27 @@
+<?php
+require_once 'db_connect.php';
+
+$sql = "SELECT quiz_id, quiz_title, description, category FROM quizzes";
+$result = $conn->query($sql);
+
+$quizzes = [];
+
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $phpQuizzes[] = [
+            'id' => (int)$row['quiz_id'],
+            'title' => $row['quiz_title'],
+            'category' => ucfirst(strtolower($row['category'])),
+            'description' => $row['description']
+        ];
+    }
+}
+
+$conn->close();
+
+$quizzesJson = json_encode($phpQuizzes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -162,30 +186,30 @@
         }
 
         .modal-actions {
-    margin-top: 20px;
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-}
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
 
-.modal-button {
-    background-color: #1e1e1e;
-    color: #f4f4f4;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-}
+        .modal-button {
+            background-color: #1e1e1e;
+            color: #f4f4f4;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
 
-.modal-button:hover,
-.modal-button:focus {
-    background-color: #333333;
-    color: #ffffff;
-    outline: none;
-    transform: translateY(-2px);
-}
+        .modal-button:hover,
+        .modal-button:focus {
+            background-color: #333333;
+            color: #ffffff;
+            outline: none;
+            transform: translateY(-2px);
+        }
 
         .close-button {
             color: #aaa;
@@ -253,6 +277,7 @@
     </div>
 
     <script>
+        <?php print "var quizzesFromDB = $quizzesJson;" ?>
         document.addEventListener('DOMContentLoaded', () => {
             const dropdownButtons = document.querySelectorAll('.admin-dropdown-button');
             const dropdownMenus = document.querySelectorAll('.admin-dropdown');
@@ -278,32 +303,8 @@
                     }
                 });
             });
-            const quizzes = [{
-                    id: 2,
-                    title: "Advanced Math Concepts",
-                    category: "Hard"
-                },
-                {
-                    id: 3,
-                    title: "Science for Advanced Learners",
-                    category: "Hard"
-                },
-                {
-                    id: 7,
-                    title: "Financial Literacy Basics",
-                    category: "Hard"
-                },
-                {
-                    id: 10,
-                    title: "Advanced Algebra",
-                    category: "Hard"
-                },
-                {
-                    id: 11,
-                    title: "Physics Fundamentals",
-                    category: "Hard"
-                }
-            ];
+
+            var quizzes = quizzesFromDB;
 
             function createQuizButton(quiz) {
                 const button = document.createElement('button');
