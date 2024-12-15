@@ -70,7 +70,6 @@ while ($row = $questions_result->fetch_assoc()) {
 
 $conn->close();
 
-// Convert questions to a zero-indexed array for JavaScript
 $questions = array_values($questions);
 $questions_json = json_encode($questions, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 ?>
@@ -84,7 +83,6 @@ $questions_json = json_encode($questions, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX
     <link rel="stylesheet" href="../css/studentheader.css">
     <link rel="stylesheet" href="../css/font-awesome.css">
     <style>
-        /* Import fonts */
         @import url('https://fonts.googleapis.com/css2?family=Oleo+Script:wght@400;700&display=swap');
 
         body {
@@ -324,47 +322,22 @@ $questions_json = json_encode($questions, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX
         }
 
         function selectAnswer(button, question) {
-            const previouslySelectedButton = optionsContainer.querySelector('.selected');
-            const attempt_id = sessionStorage.getItem('attempt_id');
+            const selectedButtons = optionsContainer.querySelectorAll('.selected');
+            selectedButtons.forEach(btn => btn.classList.remove('selected'));
+            button.classList.add('selected');
+            question.selectedAnswer = button.dataset.optionId;
+        }
 
-            if (!attempt_id) {
-                alert('Quiz attempt not found. Please refresh the page.');
+        function goNext() {
+            const currentQuestion = questions[currentQuestionIndex];
+            const selectedOptionId = currentQuestion.selectedAnswer;
+
+            if (!selectedOptionId) {
+                alert('Please select an answer before proceeding.');
                 return;
             }
 
-            if (previouslySelectedButton) {
-                if (previouslySelectedButton.dataset.isCorrect === '1') {
-                    score--;
-                }
-                previouslySelectedButton.classList.remove('selected');
-
-                fetch('remove_user_answer.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        attempt_id: attempt_id,
-                        question_id: question.question_id
-                    }),
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (!data.success) {
-                            console.error('Failed to remove previous answer:', data.message);
-                        }
-                    })
-                    .catch((error) => {
-                        console.error('Error:', error);
-                    });
-            }
-
-            button.classList.add('selected');
-            question.selectedAnswer = button.dataset.optionId;
-
-            if (button.dataset.isCorrect === '1') {
-                score++;
-            }
+            const isCorrect = currentQuestion.options.find(option => option.option_id == selectedOptionId).is_correct;
 
             fetch('save_user_answer.php', {
                 method: 'POST',
@@ -372,59 +345,88 @@ $questions_json = json_encode($questions, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    attempt_id: attempt_id,
-                    question_id: question.question_id,
-                    chosen_option_id: button.dataset.optionId,
-                    is_correct: button.dataset.isCorrect === '1' ? 1 : 0
-                }),
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (!data.success) {
-                        console.error('Failed to save answer:', data.message);
-                    }
-                })
-                .catch((error) => {
-                    console.error('Error:', error);
-                });
-        }
-
-        function goNext() {
-            if (currentQuestionIndex < questions.length - 1) {
-                currentQuestionIndex++;
-                showQuestion();
-            }
-        }
-
-        function submitQuiz() {
-            const attempt_id = sessionStorage.getItem('attempt_id');
-
-            if (!attempt_id) {
-                alert('Quiz attempt not found. Please refresh the page.');
-                return;
-            }
-
-            fetch('submit_quiz_attempt.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    attempt_id: attempt_id,
-                    score: score
+                    attempt_id: sessionStorage.getItem('attempt_id'),
+                    question_id: currentQuestion.question_id,
+                    chosen_option_id: selectedOptionId,
+                    is_correct: isCorrect ? 1 : 0
                 }),
             })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        window.location.href = `studentquizresult.php?attempt_id=${attempt_id}`;
+                        if (isCorrect) {
+                            score++;
+                        }
+                        currentQuestionIndex++;
+                        showQuestion();
                     } else {
-                        alert('There was an error submitting your quiz. Please try again.');
+                        alert('Failed to save your answer. Please try again.');
                     }
                 })
                 .catch((error) => {
                     console.error('Error:', error);
-                    alert('There was an error submitting your quiz. Please try again.');
+                    alert('There was an error saving your answer. Please try again.');
+                });
+        }
+
+        function submitQuiz() {
+            const currentQuestion = questions[currentQuestionIndex];
+            const selectedOptionId = currentQuestion.selectedAnswer;
+
+            if (!selectedOptionId) {
+                alert('Please select an answer before submitting.');
+                return;
+            }
+
+            const isCorrect = currentQuestion.options.find(option => option.option_id == selectedOptionId).is_correct;
+
+            fetch('save_user_answer.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    attempt_id: sessionStorage.getItem('attempt_id'),
+                    question_id: currentQuestion.question_id,
+                    chosen_option_id: selectedOptionId,
+                    is_correct: isCorrect ? 1 : 0
+                }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        if (isCorrect) {
+                            score++;
+                        }
+                        fetch('submit_quiz_attempt.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                attempt_id: sessionStorage.getItem('attempt_id'),
+                                score: score
+                            }),
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    window.location.href = `studentquizresult.php?attempt_id=${sessionStorage.getItem('attempt_id')}`;
+                                } else {
+                                    alert('There was an error submitting your quiz. Please try again.');
+                                }
+                            })
+                            .catch((error) => {
+                                console.error('Error:', error);
+                                alert('There was an error submitting your quiz. Please try again.');
+                            });
+                    } else {
+                        alert('Failed to save your answer. Please try again.');
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    alert('There was an error saving your answer. Please try again.');
                 });
         }
 
