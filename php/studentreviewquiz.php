@@ -116,6 +116,7 @@ $questions = array_values($questions);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Review Quiz - <?php echo htmlspecialchars($attempt['quiz_title']); ?></title>
     <link rel="stylesheet" href="../css/studentheader.css">
+    <link rel="stylesheet" href="../css/student.css">
     <link rel="stylesheet" href="../css/font-awesome.css">
     <style>
         /* Import fonts */

@@ -31,6 +31,7 @@ $quizzesJson = json_encode($phpQuizzes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_A
     <meta name="description" content="Hard Quizzes Dashboard for Students">
     <title>Hard Quizzes Dashboard (Students)</title>
     <link rel="stylesheet" href="../css/adminheader.css">
+    <link rel="stylesheet" href="../css/student.css">
     <link rel="stylesheet" href="../css/font-awesome.css">
     <style>
         body {

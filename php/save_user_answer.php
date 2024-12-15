@@ -6,7 +6,6 @@ header('Content-Type: application/json');
 
 require_once 'db_connect.php';
 
-// Check if the student is logged in
 if (!isset($_SESSION['student_id']) || $_SESSION['role'] !== 'student') {
     echo json_encode(['success' => false, 'message' => 'Unauthorized access.']);
     exit();
@@ -14,7 +13,6 @@ if (!isset($_SESSION['student_id']) || $_SESSION['role'] !== 'student') {
 
 $student_id = $_SESSION['student_id'];
 
-// Get the POST data
 $data = json_decode(file_get_contents('php://input'), true);
 
 if (
@@ -33,7 +31,6 @@ $question_id = intval($data['question_id']);
 $chosen_option_id = intval($data['chosen_option_id']);
 $is_correct = intval($data['is_correct']);
 
-// Insert or update the user's answer
 $insert_sql = "INSERT INTO user_answers (attempt_id, question_id, chosen_option_id, correct)
                VALUES (?, ?, ?, ?)
                ON DUPLICATE KEY UPDATE chosen_option_id = VALUES(chosen_option_id), correct = VALUES(correct), answered_at = NOW()";
