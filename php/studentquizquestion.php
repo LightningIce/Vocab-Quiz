@@ -189,9 +189,9 @@ header .name {
 <body>
     <header>
     <div class="name">
-    <img src="logo3.png" alt="Logo" class="logo-img">    
+    <img src="../images/logo3.png" alt="Logo" class="logo-img">    
     Vocab Quiz</div>
-    <img src="profile2.png" alt="profile" class="profile-img">
+    <img src="../images/profile2.png" alt="profile" class="profile-img">
     </header>
     <div class="quiz-container">
         <div class="quiz-header">
@@ -211,7 +211,7 @@ header .name {
         <button class="backBtn" id="backBtn">Back</button>
         <button class = "nextBtn" id="nextBtn">Next</button>
     </div>
-    <img src="questions.png" alt="question" class="question-img">
+    <img src="../images/questions.png" alt="question" class="question-img">
 ,<script>
     const questions = [
         {
@@ -406,7 +406,7 @@ function goBack() {
 });
 
     function showResults(isPassed) {
-        const resultPage = "Final result.php";  // Replace with the actual result page name
+        const resultPage = "studentquizresult.php";  // Replace with the actual result page name
         const finalScore = score * 10; 
         window.location.href = `${resultPage}?score=${finalScore}&passed=${isPassed}`;
     }
