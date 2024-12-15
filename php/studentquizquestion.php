@@ -248,8 +248,6 @@ $questions_json = json_encode($questions, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX
     <div class="quiz-container">
         <div class="quiz-header">
             <span class="progress" id="progress">Question 1 of <?php echo count($questions); ?></span>
-            <!-- Removed the score display -->
-            <!-- <span class="score" id="score">Score: 0</span> -->
         </div>
         <div class="question">
             <h2 id="question">Question text</h2>
@@ -266,28 +264,22 @@ $questions_json = json_encode($questions, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX
     </div>
 
     <script>
-        // Fetch questions from PHP
         const questions = <?php echo $questions_json; ?>;
 
         const questionElement = document.getElementById('question');
         const optionsContainer = document.getElementById('options');
         const nextButton = document.getElementById('nextBtn');
         const progressElement = document.getElementById('progress');
-        // Removed the scoreElement as it's no longer needed
-        // const scoreElement = document.getElementById('score');
         const submitButton = document.getElementById('submitBtn');
 
         let currentQuestionIndex = 0;
         let score = 0;
 
-        // Initialize selected answers
         questions.forEach(question => {
             question.selectedAnswer = null;
         });
 
-        // Function to start a quiz attempt
         function startQuiz() {
-            // Create a new quiz attempt in the database
             fetch('start_quiz_attempt.php', {
                 method: 'POST',
                 headers: {
@@ -301,7 +293,6 @@ $questions_json = json_encode($questions, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Store the attempt_id in session storage for later use
                         sessionStorage.setItem('attempt_id', data.attempt_id);
                         showQuestion();
                     } else {
@@ -326,7 +317,6 @@ $questions_json = json_encode($questions, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX
                 button.dataset.optionId = option.option_id;
                 button.dataset.isCorrect = option.is_correct;
 
-                // Highlight if previously selected
                 if (currentQuestion.selectedAnswer === option.option_id) {
                     button.classList.add('selected');
                 }
@@ -335,15 +325,10 @@ $questions_json = json_encode($questions, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX
                 optionsContainer.appendChild(button);
             });
 
-            // Update navigation buttons
-            // Removed Back Button logic
             nextButton.style.display = currentQuestionIndex < questions.length - 1 ? 'inline-block' : 'none';
             submitButton.style.display = currentQuestionIndex === questions.length - 1 ? 'inline-block' : 'none';
 
-            // Update progress
             progressElement.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
-            // Removed score display update
-            // scoreElement.textContent = `Score: ${score}`;
         }
 
         function selectAnswer(button, question) {
@@ -356,13 +341,11 @@ $questions_json = json_encode($questions, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX
             }
 
             if (previouslySelectedButton) {
-                // If previously selected was correct, decrease score
                 if (previouslySelectedButton.dataset.isCorrect === '1') {
                     score--;
                 }
                 previouslySelectedButton.classList.remove('selected');
 
-                // Remove previous answer from user_answers table
                 fetch('remove_user_answer.php', {
                     method: 'POST',
                     headers: {
@@ -384,19 +367,13 @@ $questions_json = json_encode($questions, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX
                     });
             }
 
-            // Select the new answer
             button.classList.add('selected');
             question.selectedAnswer = button.dataset.optionId;
 
-            // If the new answer is correct, increase score
             if (button.dataset.isCorrect === '1') {
                 score++;
             }
 
-            // Update the score display (removed)
-            // scoreElement.textContent = `Score: ${score}`;
-
-            // Save the answer to the database
             fetch('save_user_answer.php', {
                 method: 'POST',
                 headers: {
