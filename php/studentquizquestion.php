@@ -4,22 +4,19 @@
 session_start();
 require_once 'db_connect.php';
 
-// Check if the student is logged in
 if (!isset($_SESSION['student_id']) || $_SESSION['role'] !== 'student') {
-    header("Location: alllogin.php"); // Redirect to login page if not logged in
+    header("Location: alllogin.php");
     exit();
 }
 
 $student_id = $_SESSION['student_id'];
 
-// Check if quiz_id is set
 if (!isset($_GET['quiz_id'])) {
     die("Quiz ID not specified.");
 }
 
 $quiz_id = intval($_GET['quiz_id']);
 
-// Fetch quiz details
 $quiz_sql = "SELECT quiz_title, description, category FROM quizzes WHERE quiz_id = ?";
 $stmt = $conn->prepare($quiz_sql);
 $stmt->bind_param("i", $quiz_id);
@@ -32,7 +29,6 @@ if ($quiz_result->num_rows === 0) {
 
 $quiz = $quiz_result->fetch_assoc();
 
-// Fetch questions and options with computed is_correct
 $questions_sql = "
     SELECT 
         q.question_id, 
@@ -145,8 +141,6 @@ $questions_json = json_encode($questions, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX
             margin-bottom: 20px;
         }
 
-        /* Removed styles related to .score */
-
         .question {
             font-size: 1.5rem;
             margin-bottom: 20px;
@@ -179,7 +173,7 @@ $questions_json = json_encode($questions, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX
 
         .navigation-buttons {
             display: flex;
-            justify-content: flex-end; /* Align buttons to the right */
+            justify-content: flex-end;
         }
 
         .nav-button {
@@ -191,7 +185,7 @@ $questions_json = json_encode($questions, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s, transform 0.2s;
-            margin-left: 10px; /* Space between buttons */
+            margin-left: 10px;
         }
 
         .nav-button:hover {
@@ -236,7 +230,7 @@ $questions_json = json_encode($questions, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX
             }
 
             .navigation-buttons {
-                justify-content: center; /* Center buttons on small screens */
+                justify-content: center;
             }
         }
     </style>
@@ -252,11 +246,9 @@ $questions_json = json_encode($questions, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX
         <div class="question">
             <h2 id="question">Question text</h2>
             <div class="options" id="options">
-                <!-- Options will be dynamically inserted here -->
             </div>
         </div>
         <div class="navigation-buttons">
-            <!-- Removed Back Button -->
             <button class="nav-button" id="nextBtn">Next</button>
         </div>
         <button class="submit-button" id="submitBtn" style="display: none;">Submit Quiz</button>
@@ -412,7 +404,6 @@ $questions_json = json_encode($questions, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX
                 return;
             }
 
-            // Update the end_time and calculate the score in the database
             fetch('submit_quiz_attempt.php', {
                 method: 'POST',
                 headers: {
@@ -426,7 +417,6 @@ $questions_json = json_encode($questions, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Redirect to the results page
                         window.location.href = `studentquizresult.php?attempt_id=${attempt_id}`;
                     } else {
                         alert('There was an error submitting your quiz. Please try again.');
@@ -441,7 +431,6 @@ $questions_json = json_encode($questions, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX
         nextButton.addEventListener('click', goNext);
         submitButton.addEventListener('click', submitQuiz);
 
-        // Start the quiz
         startQuiz();
     </script>
 </body>
