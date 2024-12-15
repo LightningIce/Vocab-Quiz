@@ -7,8 +7,8 @@
             VocabQuiz
         </div>
         <ul class="nav-links">
-            <li><a href="#home">Home</a></li>
-            <li><a href="#quizzes">Quizzes</a></li>
+            <li><a href="studenthomepage.php">Home</a></li>
+            <li><a href="studentdashboard.php">Quizzes</a></li>
             <li><a href="#about">About</a></li>
             <li><a href="#contact">Contact</a></li>
         </ul>
@@ -18,9 +18,9 @@
             </div>
             <div class="profile-dropdown">
                 <a href="#profile">My Profile</a>
-                <a href="#history">Quiz History</a>
+                <a href="studentquizhistory.php">Quiz History</a>
                 <a href="#settings">Settings</a>
-                <a href="#logout">Logout</a>
+                <a href="logout.php">Logout</a>
             </div>
         </div>
     </nav>
