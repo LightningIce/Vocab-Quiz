@@ -359,6 +359,10 @@ $quizzesJson = json_encode($phpQuizzes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_A
                 const modalDescription = document.getElementById('modal-description');
                 modalTitle.textContent = quiz.title;
                 modalDescription.textContent = `Details about the "${quiz.title}" quiz can be displayed here.`;
+                const takeQuizButton = document.querySelector('.modal-button.review-edit');
+                takeQuizButton.onclick = () => {
+                    window.location.href = `studentquizquestion.php?quiz_id=${quiz.id}`;
+                };
                 modal.style.display = 'block';
                 modal.setAttribute('aria-hidden', 'false');
                 modal.querySelector('.close-button').focus();

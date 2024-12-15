@@ -1,417 +1,388 @@
+<?php
+// studentquizquestion.php
+
+session_start();
+require_once 'db_connect.php';
+
+// Check if the student is logged in
+if (!isset($_SESSION['student_id'])) {
+    header("Location: alllogin.php");
+    exit();
+}
+
+$student_id = $_SESSION['student_id'];
+
+// Check if quiz_id is set
+if (!isset($_GET['quiz_id'])) {
+    die("Quiz ID not specified.");
+}
+
+$quiz_id = intval($_GET['quiz_id']);
+
+// Fetch quiz details
+$quiz_sql = "SELECT quiz_title, quiz_description, quiz_category FROM quiz WHERE quiz_id = ?";
+$stmt = $conn->prepare($quiz_sql);
+$stmt->bind_param("i", $quiz_id);
+$stmt->execute();
+$quiz_result = $stmt->get_result();
+
+if ($quiz_result->num_rows === 0) {
+    die("Quiz not found.");
+}
+
+$quiz = $quiz_result->fetch_assoc();
+
+// Fetch questions and answers
+$questions_sql = "SELECT q.question_id, q.question_text, q.question_type, a.answer_id, a.answer_text, a.is_correct
+                FROM question q
+                JOIN answer a ON q.question_id = a.question_id
+                WHERE q.quiz_id = ?
+                ORDER BY q.question_id ASC, a.answer_id ASC";
+$stmt = $conn->prepare($questions_sql);
+$stmt->bind_param("i", $quiz_id);
+$stmt->execute();
+$questions_result = $stmt->get_result();
+
+$questions = [];
+while ($row = $questions_result->fetch_assoc()) {
+    $qid = $row['question_id'];
+    if (!isset($questions[$qid])) {
+        $questions[$qid] = [
+            'question_id' => $qid,
+            'question_text' => $row['question_text'],
+            'question_type' => $row['question_type'],
+            'options' => []
+        ];
+    }
+    $questions[$qid]['options'][] = [
+        'answer_id' => $row['answer_id'],
+        'answer_text' => $row['answer_text'],
+        'is_correct' => $row['is_correct']
+    ];
+}
+
+$conn->close();
+
+// Convert questions to a zero-indexed array for JavaScript
+$questions = array_values($questions);
+$questions_json = json_encode($questions, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Assignment</title>
-    <style >
-        /* General Reset */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #000;
-    color: #f4f4f4;
-    padding: 1rem 2rem;
-}
-
-header .logo-img {
-    width: 35px; /* Adjust logo size */
-    height: 35px; /* Maintain aspect ratio */
-    margin-right: 2px; /* Add spacing between the logo and text */
-}
-
-header .name {
-    font-size: 2.0rem;
-    font-weight: bold;
-}
-
-.profile-img {
-    width: 50px; /* Adjust logo size */
-    height: 50px; /* Maintain aspect ratio */
-    margin-right: 5px; /* Add spacing between the logo and text */
-}
-
-.quiz-container {
-    width: 90%;
-    max-width: 600px;
-    background: #fff;
-    border-radius: 10px;
-    padding: 70px;
-    margin: 1px auto; /* Center container horizontally */
-    text-align: center; /* Align content inside the container */
-}
-
-.quiz-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.progress {
-    font-family: Arial, Bold;
-    font-weight: bold;
-    font-size: 1.5rem;
-}
-
-.points {
-    font-family: Arial, Bold;
-    font-weight: bold;
-    font-size: 1.5rem;
-}
-
-.question {
-    font-family: "Oleo Script", cursive;
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.question h2 {
-    font-size: 1.5rem;
-    color: #333;
-}
-
-.options {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-}
-
-.option {
-    padding: 10px;
-    border: none;
-    background-color: #e0e0e0;
-    color: #333;
-    font-family: Oleo Script, Bold;
-    font-size: 2rem;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.option:hover {
-    background-color: #000; /* Highlight color, you can choose your own */
-    color: white; /* Change text color to contrast with the background */
-}
-
-.lowerBtn {
-    display: flex;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-}
-
-
-.nextBtn {
-    padding: 10px;
-    border: none;
-    background-color: #e0e0e0;
-    color: #333;
-    align-items: center;
-    font-family: Oleo Script, Bold;
-    font-size: 2rem;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-top: 20px;
-    width: 50;
-    text-align: center;
-    right: 20px;
-}
-
-.backBtn {
-    padding: 10px;
-    border: none;
-    background-color: #e0e0e0;
-    color: #333;
-    align-items: center;
-    font-family: Oleo Script, Bold;
-    font-size: 2rem;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-top: 20px;
-    width: 50;
-    text-align: center;
-}
-
-.nextBtn:hover {
-    background-color: #000; /* Highlight color, you can choose your own */
-    color: white;
-}
-
-.backBtn:hover {
-    background-color: #000; /* Highlight color, you can choose your own */
-    color: white;
-}
-
-.hint {
-    grid-column: span 2;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #e0e0e0;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.hint img {
-    width: 25px;
-    height: 25px;
-}
-
-.question-img {
-    width: 100%; /* Let the image fill the container's width */
-    max-width: 250px; /* Set a maximum size for the image */
-    height: auto; /* Maintain aspect ratio */
-    display: block;
-    margin: 1px auto 0; /* Center the image with vertical spacing */
-}
-
-.option.selected {
-    background-color: #000; /* Highlight color, you can choose your own */
-    color: white; /* Change text color to contrast with the background */
-}
-
-</style>
-</head>
+    <title>Take Quiz - <?php echo htmlspecialchars($quiz['quiz_title']); ?></title>
+    <link rel="stylesheet" href="../css/studentheader.css">
+    <link rel="stylesheet" href="../css/font-awesome.css">
     <style>
-        /*import fonts*/
+        /* Import fonts */
         @import url('https://fonts.googleapis.com/css2?family=Oleo+Script:wght@400;700&display=swap');
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #000;
+            color: #f4f4f4;
+            padding: 1rem 2rem;
+        }
+
+        header .logo-img {
+            width: 35px;
+            height: 35px;
+            margin-right: 10px;
+        }
+
+        header .name {
+            font-size: 2rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .quiz-container {
+            width: 90%;
+            max-width: 800px;
+            background: #1e1e1e;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 50px auto;
+            text-align: center;
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .progress {
+            font-size: 1.2rem;
+        }
+
+        .score {
+            font-size: 1.2rem;
+        }
+
+        .question {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .option {
+            padding: 10px;
+            border: none;
+            background-color: #333333;
+            color: #f4f4f4;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            text-align: left;
+        }
+
+        .option:hover,
+        .option.selected {
+            background-color: #555555;
+            transform: translateY(-2px);
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .nav-button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #1e1e1e;
+            color: #f4f4f4;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .nav-button:hover {
+            background-color: #333333;
+            transform: translateY(-2px);
+        }
+
+        .submit-button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #28a745;
+            color: #ffffff;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            margin-top: 20px;
+        }
+
+        .submit-button:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+
+        .question-img {
+            width: 100%;
+            max-width: 250px;
+            height: auto;
+            display: block;
+            margin: 20px auto 0;
+        }
+
+        @media (max-width: 600px) {
+            .quiz-container {
+                padding: 10px;
+            }
+
+            .nav-button,
+            .submit-button {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
     </style>
+</head>
+
 <body>
-    <header>
-    <div class="name">
-    <img src="../images/logo3.png" alt="Logo" class="logo-img">    
-    Vocab Quiz</div>
-    <img src="../images/profile2.png" alt="profile" class="profile-img">
-    </header>
+    <?php include 'studentheader.php'; ?>
+
     <div class="quiz-container">
         <div class="quiz-header">
-            <span class="progress" id="progress"></span>
-            <span class="points" id="progress"></span>
+            <span class="progress" id="progress">Question 1 of <?php echo count($questions); ?></span>
+            <span class="score" id="score">Score: 0</span>
         </div>
         <div class="question">
-            <h2 id="question">Question here</h2>
-        <div class="options" id="options">
-            <button class="option">Ans 1</button>
-            <button class="option">Ans 2</button>
-            <button class="option">Ans 3</button>
-            <button class="option">Ans 4</button>
+            <h2 id="question">Question text</h2>
+            <div class="options" id="options">
+                <!-- Options will be dynamically inserted here -->
+            </div>
         </div>
+        <div class="navigation-buttons">
+            <button class="nav-button" id="backBtn" style="display: none;">Back</button>
+            <button class="nav-button" id="nextBtn">Next</button>
+        </div>
+        <button class="submit-button" id="submitBtn" style="display: none;">Submit Quiz</button>
     </div>
-    <div class="lowerBtn">
-        <button class="backBtn" id="backBtn">Back</button>
-        <button class = "nextBtn" id="nextBtn">Next</button>
-    </div>
-    <img src="../images/questions.png" alt="question" class="question-img">
-,<script>
-    const questions = [
-        {
-            question: "What is a synonym of happy ?",
-            options: [
-                {text: "Joy", correct: true},
-                {text: "Sad", correct: false} ,
-                {text: "Depressed", correct: false},
-                {text: "Angry", correct: false},
-            ]
-        },
-        {
-            question: "What is the capital of France?",
-            options: [
-                {text: "Paris", correct: false},
-                {text: "Berlin", correct: true} ,
-                {text: "Marlin", correct: false},
-                {text: "Rome", correct: false},
-            ]
-        },
-        {
-            question: "What is 1 + 1?",
-            options: [
-                {text: "2", correct: false},
-                {text: "35", correct: true} ,
-                {text: "1", correct: false},
-                {text: "idk", correct: false},
-            ]
-        },
-        {
-            question: "Spell BMW.",
-            options: [
-                {text: "Deywha", correct: true},
-                {text: "BMW", correct: false} ,
-                {text: "a car", correct: false},
-                {text: "huh?", correct: false},
-            ]
-        },
-        {
-            question: "How deep is a 6 foot hole?",
-            options: [
-                {text: "6 foot", correct: false},
-                {text: "0.001 miles", correct: false} ,
-                {text: "88.001 yards", correct: false},
-                {text: "it's about like 20 feet", correct: true},
-            ]
-        },
-        {
-            question: "What color is a carrot?",
-            options: [
-                {text: "green", correct: true},
-                {text: "orange", correct: false} ,
-                {text: "idk about carrots", correct: false},
-                {text: "its a vegetable", correct: false},
-            ]
-        },
-        {
-            question: "What color is a carrot?",
-            options: [
-                {text: "green", correct: true},
-                {text: "orange", correct: false} ,
-                {text: "idk about carrots", correct: false},
-                {text: "its a vegetable", correct: false},
-            ]
-        },
-        {
-            question: "What color is a carrot?",
-            options: [
-                {text: "green", correct: true},
-                {text: "orange", correct: false} ,
-                {text: "idk about carrots", correct: false},
-                {text: "its a vegetable", correct: false},
-            ]
-        },
-        {
-            question: "What color is a carrot?",
-            options: [
-                {text: "green", correct: true},
-                {text: "orange", correct: false} ,
-                {text: "idk about carrots", correct: false},
-                {text: "its a vegetable", correct: false},
-            ]
-        },{
-            question: "What color is a carrot?",
-            options: [
-                {text: "green", correct: true},
-                {text: "orange", correct: false} ,
-                {text: "idk about carrots", correct: false},
-                {text: "its a vegetable", correct: false},
-            ]
-        }
-    ];
+
+    <script>
+        // Fetch questions from PHP
+        const questions = <?php echo $questions_json; ?>;
 
         const questionElement = document.getElementById('question');
-        const optionsButton = document.getElementById('options');
+        const optionsContainer = document.getElementById('options');
         const nextButton = document.getElementById('nextBtn');
-        const progressElement = document.getElementById('progress');
-        const pointsElement = document.getElementById('points');
         const backButton = document.getElementById('backBtn');
+        const progressElement = document.getElementById('progress');
+        const scoreElement = document.getElementById('score');
+        const submitButton = document.getElementById('submitBtn');
 
-    let currentQuestionIndex = 0;
-    let score = 0;
+        let currentQuestionIndex = 0;
+        let score = 0;
 
-    // Add a "selectedAnswer" property to each question to track the user's answer
-    questions.forEach(question => {
-    question.selectedAnswer = null; // Initialize selectedAnswer to null
-    });
+        // Initialize selected answers
+        questions.forEach(question => {
+            question.selectedAnswer = null;
+        });
 
-    function startQuiz() {
-    currentQuestionIndex = 0;
-    score = 0;
-    // Reset the "selectedAnswer" for all questions
-    questions.forEach(question => (question.selectedAnswer = null));
-    showQuestion();
-}
+        function showQuestion() {
+            const currentQuestion = questions[currentQuestionIndex];
+            questionElement.textContent = `Q${currentQuestionIndex + 1}: ${currentQuestion.question_text}`;
+            optionsContainer.innerHTML = '';
 
-function showQuestion() {
-    let currentQuestion = questions[currentQuestionIndex];
-    questionElement.innerHTML = (currentQuestionIndex + 1) + ". " + currentQuestion.question; // Set question text
-    optionsButton.innerHTML = ""; // Clear previous options
+            currentQuestion.options.forEach(option => {
+                const button = document.createElement('button');
+                button.classList.add('option');
+                button.textContent = option.answer_text;
+                button.dataset.correct = option.is_correct;
 
-    // Create buttons for each option
-    currentQuestion.options.forEach(option => {
-        const button = document.createElement("button");
-        button.innerHTML = option.text;
-        button.classList.add("option");
-        if (currentQuestion.selectedAnswer === option.text) {
-            button.classList.add("selected");
+                // Highlight if previously selected
+                if (currentQuestion.selectedAnswer === option.answer_id) {
+                    button.classList.add('selected');
+                }
+
+                button.addEventListener('click', () => selectAnswer(button, currentQuestion));
+                optionsContainer.appendChild(button);
+            });
+
+            // Update navigation buttons
+            backButton.style.display = currentQuestionIndex > 0 ? 'inline-block' : 'none';
+            nextButton.style.display = currentQuestionIndex < questions.length - 1 ? 'inline-block' : 'none';
+            submitButton.style.display = currentQuestionIndex === questions.length - 1 ? 'inline-block' : 'none';
+
+            // Update progress and score
+            progressElement.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+            scoreElement.textContent = `Score: ${score}`;
         }
-        button.addEventListener("click", () => selectAnswer(option)); // Attach event listener
-        optionsButton.appendChild(button);
-    });
 
-    backButton.style.display = currentQuestionIndex > 0 ? "block" : "none";// Show Back button only if not the first question
-    // Update progress and score
-    progressElement.innerHTML = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
-    pointsElement.innerHTML =  `Score: ${score}`;
-}
+        function selectAnswer(button, question) {
+            const previouslySelectedButton = optionsContainer.querySelector('.selected');
+            if (previouslySelectedButton) {
+                // If previously selected was correct, decrease score
+                if (previouslySelectedButton.dataset.correct === 'true') {
+                    score--;
+                }
+                previouslySelectedButton.classList.remove('selected');
+            }
 
-function selectAnswer(option, button) {
-    const currentQuestion = questions[currentQuestionIndex];
+            // Select the new answer
+            button.classList.add('selected');
+            question.selectedAnswer = button.dataset.correct === 'true' ? button.textContent : null;
 
-    // If the user changes their answer, adjust the score
-    if (currentQuestion.selectedAnswer !== null) {
-        // Remove score for the previous correct answer
-        const previousAnswer = currentQuestion.options.find(opt => opt.text === currentQuestion.selectedAnswer);
-        if (previousAnswer && previousAnswer.correct) {
-            score--;
+            // If the new answer is correct, increase score
+            if (button.dataset.correct === 'true') {
+                score++;
+            }
+
+            // Update the score display
+            scoreElement.textContent = `Score: ${score}`;
         }
-    }
-    // Set the new selected answer
-    currentQuestion.selectedAnswer = option.text;
 
-    // Add score if the new answer is correct
-    if (option.correct) {
-        score++;
-    }
-    // Update UI to show the selected button
-    const allOptions = optionsContainer.querySelectorAll(".option");
-    allOptions.forEach(button => btn.classList.remove("selected")); // Remove "selected" class from all buttons
-    button.classList.add("selected"); // Highlight the newly selected button
-    // Ensure the Next button is visible
-    nextButton.style.display = "block";
-
-    // Update the score display
-    pointsElement.innerText = `Score: ${score}`;
-}
-
-function goBack() {
-    // Move to the previous question
-    if (currentQuestionIndex > 0) {
-        currentQuestionIndex--;
-        showQuestion(); // Show the previous question
-    }
-}
-
-
-    nextButton.addEventListener("click", () => {
-        currentQuestionIndex++; // Move to the next question
-        if (currentQuestionIndex < questions.length) {
-            showQuestion(); // Show the next question
-        } else {
-            showResults(); // Show results if no more questions
+        function goNext() {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                showQuestion();
+            }
         }
-    });
 
-    backButton.addEventListener("click", () => {
-    if (currentQuestionIndex > 0) {
-        currentQuestionIndex--; // Move to the previous question
-        showQuestion(); // Show the previous question
-    }
-});
+        function goBack() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                showQuestion();
+            }
+        }
 
-    function showResults(isPassed) {
-        const resultPage = "studentquizresult.php";  // Replace with the actual result page name
-        const finalScore = score * 10; 
-        window.location.href = `${resultPage}?score=${finalScore}&passed=${isPassed}`;
-    }
+        function submitQuiz() {
+            // Prepare data to send
+            const results = questions.map(q => ({
+                question_id: q.question_id,
+                selected_answer: q.selectedAnswer
+            }));
 
-    startQuiz();
-</script>
+            // Send results via AJAX to save in the database
+            fetch('submit_quiz.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    student_id: <?php echo $student_id; ?>,
+                    quiz_id: <?php echo $quiz_id; ?>,
+                    results: results,
+                    score: score
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Redirect to the results page
+                    window.location.href = `studentquizresult.php?quiz_id=<?php echo $quiz_id; ?>&score=${score}`;
+                } else {
+                    alert('There was an error submitting your quiz. Please try again.');
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('There was an error submitting your quiz. Please try again.');
+            });
+        }
+
+        nextButton.addEventListener('click', goNext);
+        backButton.addEventListener('click', goBack);
+        submitButton.addEventListener('click', submitQuiz);
+
+        // Initialize the quiz
+        showQuestion();
+    </script>
 </body>
-</html> 
+
+</html>

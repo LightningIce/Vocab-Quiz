@@ -184,9 +184,9 @@ footer {
 <body>
     <header>
     <div class="name">
-    <img src="logo3.png" alt="Logo" class="logo-img">    
+    <img src="../images/logo3.png" alt="Logo" class="logo-img">    
     Vocab Quiz</div>
-    <img src="profile2.png" alt="Profile" class="profile-img">
+    <img src="../images/profile2.png" alt="Profile" class="profile-img">
     </header>
     <main>
         <section class="hero">
@@ -198,15 +198,15 @@ footer {
             </div>
         </section>
         <section class="about" id="about" >
-            <img src="freeAccess.png" alt="freeAccess" class="free-img">
+            <img src="../images/freeAccess.png" alt="freeAccess" class="free-img">
             <p>Free access, without subscription!</p>
         </section>
         <section class="lesson">
                 <p>Short, bite-sized lessons!</p>
-                <img src="lesson.png" alt="lesson" class="lesson-img">
+                <img src="../images/lesson.png" alt="lesson" class="lesson-img">
         </section>
         <section class="modes">
-        <img src="modes.png" alt="modes" class="modes-img">
+        <img src="../images/modes.png" alt="modes" class="modes-img">
         <p>Variety of learning modes!</p>
         </section>
         <section class="contact" id="contact">
