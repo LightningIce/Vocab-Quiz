@@ -1,4 +1,10 @@
 <?php
+session_start();
+
+// Temporary: Simulate a logged-in student
+$_SESSION['student_id'] = 1; // Replace with the actual user_id of the test user
+$_SESSION['role'] = 'student';
+
 require_once 'db_connect.php';
 
 $sql = "SELECT quiz_id, quiz_title, description, category FROM quizzes";

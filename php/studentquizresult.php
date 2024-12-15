@@ -1,130 +1,153 @@
+<?php
+// studentquizresult.php
+
+session_start();
+require_once 'db_connect.php';
+
+// Check if the student is logged in
+if (!isset($_SESSION['student_id']) || $_SESSION['role'] !== 'student') {
+    header("Location: alllogin.php"); // Redirect to login page if not logged in
+    exit();
+}
+
+$student_id = $_SESSION['student_id'];
+
+// Check if attempt_id is set
+if (!isset($_GET['attempt_id'])) {
+    die("Attempt ID not specified.");
+}
+
+$attempt_id = intval($_GET['attempt_id']);
+
+// Fetch quiz attempt details
+$attempt_sql = "SELECT ua.score, q.quiz_title, q.category, ua.start_time, ua.end_time
+                FROM user_quiz_attempts ua
+                JOIN quizzes q ON ua.quiz_id = q.quiz_id
+                WHERE ua.attempt_id = ? AND ua.user_id = ?";
+$stmt = $conn->prepare($attempt_sql);
+$stmt->bind_param("ii", $attempt_id, $student_id);
+$stmt->execute();
+$attempt_result = $stmt->get_result();
+
+if ($attempt_result->num_rows === 0) {
+    die("Quiz attempt not found.");
+}
+
+$attempt = $attempt_result->fetch_assoc();
+
+// Determine pass/fail (e.g., 60% is passing)
+$total_questions_sql = "SELECT COUNT(*) as total FROM questions WHERE quiz_id = (SELECT quiz_id FROM user_quiz_attempts WHERE attempt_id = ?)";
+$stmt = $conn->prepare($total_questions_sql);
+$stmt->bind_param("i", $attempt_id);
+$stmt->execute();
+$total_result = $stmt->get_result();
+$total_questions = $total_result->fetch_assoc()['total'];
+
+$percentage = $total_questions > 0 ? ($attempt['score'] / $total_questions) * 100 : 0;
+$passing_score = 60; // Percentage required to pass
+$passed = $percentage >= $passing_score;
+
+$conn->close();
+?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <title>Web Assignment</title>
-    <style >
-        /* General Reset */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+    <title>Quiz Result - <?php echo htmlspecialchars($attempt['quiz_title']); ?></title>
+    <link rel="stylesheet" href="../css/studentheader.css">
+    <link rel="stylesheet" href="../css/font-awesome.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
 
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #000;
-    color: #f4f4f4;
-    padding: 1rem 2rem;
-}
+        .result-container {
+            background-color: #1e1e1e;
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+            width: 80%;
+            max-width: 500px;
+        }
 
-header .logo-img {
-    width: 40px; /* Adjust logo size */
-    height: 40px; /* Maintain aspect ratio */
-    margin-right: 10px; /* Add spacing between the logo and text */
-}
+        .result-container h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
 
-header .name {
-    font-size: 2.0rem;
-    font-weight: bold;
-}
+        .result-container p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
 
-.profile-img {
-    width: 50px; /* Adjust logo size */
-    height: 50px; /* Maintain aspect ratio */
-    margin-right: 5px; /* Add spacing between the logo and text */
-}
+        .result-container .score {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
 
-.easy-img {
-    width: 100%; /* Let the image fill the container's width */
-    max-width: 250px; /* Set a maximum size for the image */
-    height: auto; /* Maintain aspect ratio */
-    display: block;
-    margin: 100px auto 0; /* Center the image with vertical spacing */
-}
+        .result-container .status {
+            font-size: 1.5rem;
+            color: <?php echo $passed ? '#28a745' : '#dc3545'; ?>;
+            margin-bottom: 30px;
+        }
 
-.Result {
-    display: flex;
-    flex-direction: column; /* Stack result texts */
-    justify-content: center;
-    align-items: center;
-    height: auto; /* Remove 100vh for dynamic height */
-    margin-top: 20px;
-    font-family: "Oleo Script", cursive;
-    font-size: 35px;
-    color: #333;
-}
+        .result-container a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #1e1e1e;
+            color: #f4f4f4;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s, transform 0.2s;
+            margin: 5px;
+        }
 
-.choices {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    padding: 20px;
-}
+        .result-container a:hover {
+            background-color: #333333;
+            transform: translateY(-2px);
+        }
 
-.choice {
-    padding: 10px;
-    border: none;
-    background-color: #e0e0e0;
-    color: #333;
-    font-family: Oleo Script, Bold;
-    font-size: 2rem;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-align: center;
-    max-width: 300px;
-    min-width: 100px;
-    width: 100%;
-    justify-self: center;/*center the button in it's grid cell*/
-}
+        @media (max-width: 600px) {
+            .result-container {
+                padding: 20px;
+            }
 
-.choice:hover {
-    background-color: #d4d4d4;
-}
+            .result-container h1 {
+                font-size: 2rem;
+            }
 
+            .result-container .score {
+                font-size: 1.5rem;
+            }
+
+            .result-container .status {
+                font-size: 1.2rem;
+            }
+        }
     </style>
 </head>
-    <style>
-        /*import fonts*/
-        @import url('https://fonts.googleapis.com/css2?family=Oleo+Script:wght@400;700&display=swap');
-    </style>
+
 <body>
-<header>
-    <div class="name">
-    <img src="../images/logo3.png" alt="Logo" class="logo-img">    
-    Vocab Quiz</div>
-    <img src="../images/profile2.png" alt="profile" class="profile-img">
-    </header>
-    <img src="../images/easy.png" alt="easy" class="easy-img">
-    <div class="Result">
-        <h1>Final Result:</h1>
-        <h2 id="score-display"></h2>
+    <?php include 'studentheader.php'; ?>
+
+    <div class="result-container">
+        <h1>Quiz Results</h1>
+        <p>You have completed the quiz.</p>
+        <div class="score">Score: <?php echo htmlspecialchars($attempt['score']); ?> / <?php echo htmlspecialchars($total_questions); ?> (<?php echo number_format($percentage, 2); ?>%)</div>
+        <div class="status"><?php echo $passed ? 'Congratulations! You passed the quiz.' : 'You did not pass the quiz. Try again!'; ?></div>
+        <a href="studentdashboard.php">Back to Dashboard</a>
+        <a href="studentreviewquiz.php?attempt_id=<?php echo urlencode($attempt_id); ?>">Review Quiz</a>
     </div>
-    <div class="choices">
-        <button class=".choice" onclick="reviewQuestions()">Review Question</button>  
-        <button class=".choice" onclick="exitQuiz()">Exit</button>
-    </div>
-    <script>
-        //extract past variable
-        const urlParams = new URLSearchParams(window.location.search);
-        const score =urlParams.get('score');
-        const passed = urlParams.get('passed');
-
-        //update result
-        document.getElementById('score-display').textContent = score ? `${score}/100` : "0/100";
-
-        function reviewQuestions() {
-            window.location.href = "review.html";
-        }
-
-        function exitQuiz() {
-            window.location.href = "index.html";
-        }
-    </script>
 </body>
+
 </html>
