@@ -19,7 +19,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background-image: url(cat.jpg);
+            background-image: url(../images/cat.jpg);
             background-size: cover;
             background-position: center;
         }
