@@ -19,7 +19,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background-image: url(bg.jpg);
+            background-image: url(cat.jpg);
             background-size: cover;
             background-position: center;
         }
@@ -158,7 +158,7 @@
 
         <p class="register">
             Don't have an account?
-            <a href="#">Register</a>
+            <a href="Register.html">Register</a>
         </p>
     </form>
 
