@@ -327,7 +327,7 @@ $conn->close();
 
             <div class="profile-header">
                 <!-- Profile Avatar (You can modify the src to fetch from the database if available) -->
-                <img src="Profile_Icon.png" alt="Profile Picture" class="profile-avatar">
+                <img src="../images/icon.png" alt="Profile Picture" class="profile-avatar">
                 <div class="profile-info">
                     <h1><?php echo htmlspecialchars($full_name); ?></h1>
                     <p>Language Learner</p>
