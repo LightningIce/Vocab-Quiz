@@ -9,7 +9,7 @@
             <ul class="nav-links">
                 <li><a href="studenthomepage.php">Home</a></li>
                 <li><a href="studentdashboard.php">Quizzes</a></li>
-                <li><a href="#about">About</a></li>
+                <li><a href="studentaboutus.php">About</a></li>
                 <li><a href="studentcontactus.php">Contact</a></li>
                 <li class="profile">
             
