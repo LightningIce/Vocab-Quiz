@@ -14,7 +14,7 @@
                 <li class="profile">
             
                     <div class="profile-toggle" onclick="toggleProfileMenu()">
-                        <img src="../images/Profile_Icon.png" alt="Profile" class="profile-icon">
+                        <img src="../images/icon.png" alt="Profile" class="profile-icon">
                     </div>
                     <div class="profile-dropdown">
                         <a href="#profile">My Profile</a>
