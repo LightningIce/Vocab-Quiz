@@ -15,6 +15,8 @@ if ($conn->connect_error) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Collect Form Data
     $quizName = $_POST['quizName'];
+    $description = $_POST['description'];
+    $difficulty = $_POST['difficulty'];
     $questionText = $_POST['question'];
     $optionA = $_POST['optionA'];
     $optionB = $_POST['optionB'];
@@ -23,13 +25,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $correctAnswer = $_POST['correctAnswer'];
 
     // Validate Input
-    if (!$quizName || !$questionText || !$optionA || !$optionB || !$optionC || !$optionD || !$correctAnswer) {
+    if (!$quizName || !$description || !$difficulty || !$questionText || !$optionA || !$optionB || !$optionC || !$optionD || !$correctAnswer) {
         die("<script>alert('All fields are required.'); window.location.href = 'add-question.php';</script>");
     }
 
     // Insert Quiz into `quizzes` Table (if it doesn't already exist)
-    $stmt = $conn->prepare("INSERT INTO quizzes (quiz_title, created_by) VALUES (?, 1) ON DUPLICATE KEY UPDATE quiz_id=LAST_INSERT_ID(quiz_id)");
-    $stmt->bind_param("s", $quizName);
+    $stmt = $conn->prepare("INSERT INTO quizzes (quiz_title, description, category, created_by) VALUES (?, ?, ?, 1) ON DUPLICATE KEY UPDATE quiz_id=LAST_INSERT_ID(quiz_id)");
+    $stmt->bind_param("sss", $quizName, $description, $difficulty);
     $stmt->execute();
     $quizId = $conn->insert_id;
 
@@ -109,6 +111,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form action="add-question.php" method="POST">
             <label>Quiz Name</label>
             <input type="text" name="quizName" placeholder="Enter quiz name" required>
+
+            <label>Description</label>
+            <textarea name="description" placeholder="Enter quiz description" required></textarea>
+
+            <label>Difficulty</label>
+            <select name="difficulty" required>
+                <option value="easy">Easy</option>
+                <option value="hard">Hard</option>
+                <option value="business">Business</option>
+            </select>
 
             <label>Question</label>
             <textarea name="question" placeholder="Enter question" required></textarea>
