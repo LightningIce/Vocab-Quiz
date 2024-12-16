@@ -1,4 +1,5 @@
 <?php
+// db_connect.php
 $host = 'localhost';
 $db   = 'vocabquiz';
 $user = 'root';

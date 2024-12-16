@@ -93,36 +93,6 @@ $questions_json = json_encode($questions, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX
             margin: 0;
             padding: 0;
         }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #000;
-            color: #f4f4f4;
-            padding: 1rem 2rem;
-        }
-
-        header .logo-img {
-            width: 35px;
-            height: 35px;
-            margin-right: 10px;
-        }
-
-        header .name {
-            font-size: 2rem;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-        }
-
-        .profile-img {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            cursor: pointer;
-        }
-
         .quiz-container {
             width: 90%;
             max-width: 800px;
@@ -253,6 +223,8 @@ $questions_json = json_encode($questions, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX
         <button class="submit-button" id="submitBtn" style="display: none;">Submit Quiz</button>
         <img src="../images/questions.png" alt="question" class="question-img">
     </div>
+
+    <?php include 'studentfooter.php'; ?>
 
     <script src="../js/studentHeader.js"></script>
     <script>

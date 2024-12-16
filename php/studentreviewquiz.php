@@ -128,36 +128,6 @@ $questions = array_values($questions);
             margin: 0;
             padding: 0;
         }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #000;
-            color: #f4f4f4;
-            padding: 1rem 2rem;
-        }
-
-        header .logo-img {
-            width: 35px;
-            height: 35px;
-            margin-right: 10px;
-        }
-
-        header .name {
-            font-size: 2rem;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-        }
-
-        .profile-img {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            cursor: pointer;
-        }
-
         .review-container {
             width: 90%;
             max-width: 1000px;
@@ -316,6 +286,8 @@ $questions = array_values($questions);
             <a href="studentquizquestion.php?quiz_id=<?php echo urlencode($attempt['quiz_id']); ?>">Try Again</a>
         </div>
     </div>
+
+    <?php include 'studentfooter.php'?>
     <script src="../js/studentHeader.js"></script>
 </body>
 
