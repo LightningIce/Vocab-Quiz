@@ -214,15 +214,13 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['role'] !== 'student' && $_SESSIO
                 <img src="../images/icon.png" alt="Black Cat Mascot" class="cat-image">
             </div>
         </section>
-
-        <section class="quiz-overview">
+<section class="quiz-overview">
             <div class="quiz-card">
                 <div class="quiz-icon">📚</div>
                 <h2>Recent Quiz</h2>
-                <p>Advanced Vocabulary</p>
+                <p>View All Past Quiz Attempt</p>
                 <div class="quiz-stats">
-                    <span>Score: 85%</span>
-                    <button onclick="viewQuizDetails()">View Details</button>
+                    <a href="studentquizhistory.php"><button>View History</button></a>
                 </div>
             </div>
 
@@ -231,18 +229,16 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['role'] !== 'student' && $_SESSIO
                 <h2>Academic English</h2>
                 <p>Comprehensive Vocabulary Test</p>
                 <div class="quiz-stats">
-                    <span>Status: Available</span>
-                    <button onclick="startQuiz()">Begin Quiz</button>
+                    <a href="studentquizhistoryeasy.php"><button>Start Quiz</button></a>
                 </div>
             </div>
 
             <div class="quiz-card">
                 <div class="quiz-icon">💼</div>
-                <h2>Business Terminology</h2>
+                <h2>Business English</h2>
                 <p>Professional Language Skills</p>
                 <div class="quiz-stats">
-                    <span>Status: In Progress</span>
-                    <button onclick="resumeQuiz()">Continue</button>
+                    <a href="studentdashboardbusiness.php"><button>Start Quiz</button></a>
                 </div>
             </div>
         </section>
