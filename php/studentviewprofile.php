@@ -32,62 +32,87 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = "Username, Email, and Current Password are required.";
     }
 
-    // Fetch the current hashed password from the database
+    // Fetch the current password from the database
     $stmt = $conn->prepare("SELECT password FROM users WHERE user_id = ?");
-    $stmt->bind_param("i", $user_id);
-    $stmt->execute();
-    $stmt->bind_result($hashed_password);
-    if (!$stmt->fetch()) {
-        $errors[] = "User not found.";
+    if ($stmt) {
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $stmt->bind_result($stored_password);
+        if (!$stmt->fetch()) {
+            $errors[] = "User not found.";
+        }
+        $stmt->close();
+    } else {
+        $errors[] = "Database error: Unable to prepare statement.";
     }
-    $stmt->close();
 
-    // Verify the current password
-    if (!password_verify($current_password, $hashed_password)) {
+    // Verify the current password (plain text comparison)
+    if (!empty($current_password) && $current_password !== $stored_password) {
         $errors[] = "Current password is incorrect.";
     }
 
     // If no errors, proceed to update
     if (empty($errors)) {
-        // Prepare the update statement
+        // Determine if the password needs to be updated
+        $update_password = false;
         if (!empty($new_password)) {
             if ($new_password !== $confirm_password) {
                 $errors[] = "New passwords do not match.";
             } else {
-                $new_hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
-                $stmt = $conn->prepare("UPDATE users SET username = ?, email = ?, password = ? WHERE user_id = ?");
-                $stmt->bind_param("sssi", $username, $email, $new_hashed_password, $user_id);
+                $update_password = true;
             }
-        } else {
-            $stmt = $conn->prepare("UPDATE users SET username = ?, email = ? WHERE user_id = ?");
-            $stmt->bind_param("ssi", $username, $email, $user_id);
         }
 
-        // Execute the update if there are still no errors
+        // If still no errors, prepare the update statement
         if (empty($errors)) {
-            if ($stmt->execute()) {
-                $success = "Profile updated successfully.";
+            if ($update_password) {
+                // Update username, email, and password
+                $stmt = $conn->prepare("UPDATE users SET username = ?, email = ?, password = ? WHERE user_id = ?");
+                if ($stmt) {
+                    $stmt->bind_param("sssi", $username, $email, $new_password, $user_id);
+                } else {
+                    $errors[] = "Database error: Unable to prepare update statement.";
+                }
             } else {
-                $errors[] = "Failed to update profile. Please try again.";
+                // Update only username and email
+                $stmt = $conn->prepare("UPDATE users SET username = ?, email = ? WHERE user_id = ?");
+                if ($stmt) {
+                    $stmt->bind_param("ssi", $username, $email, $user_id);
+                } else {
+                    $errors[] = "Database error: Unable to prepare update statement.";
+                }
             }
-            $stmt->close();
+
+            // Execute the update if the statement was prepared successfully
+            if (isset($stmt) && empty($errors)) {
+                if ($stmt->execute()) {
+                    $success = "Profile updated successfully.";
+                } else {
+                    $errors[] = "Failed to update profile. Please try again.";
+                }
+                $stmt->close();
+            }
         }
     }
 }
 
 // Fetch user data to display
 $stmt = $conn->prepare("SELECT username, email, full_name FROM users WHERE user_id = ?");
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$stmt->bind_result($db_username, $db_email, $db_full_name);
-$stmt->fetch();
-$stmt->close();
+if ($stmt) {
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $stmt->bind_result($db_username, $db_email, $db_full_name);
+    $stmt->fetch();
+    $stmt->close();
+} else {
+    $errors[] = "Database error: Unable to prepare statement.";
+}
 
-// If form was not submitted, populate variables with database values
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    $username = $db_username;
-    $email = $db_email;
-    $full_name = $db_full_name;
+// If form was not submitted or there were errors, populate variables with database values
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !empty($errors)) {
+    $username = htmlspecialchars($db_username);
+    $email = htmlspecialchars($db_email);
+    $full_name = htmlspecialchars($db_full_name);
 }
 
 $conn->close();
@@ -286,10 +311,12 @@ $conn->close();
 
     <main>
         <div class="profile-container">
+            <!-- Display Success Message -->
             <?php if (!empty($success)) : ?>
                 <div class="success-message"><?php echo htmlspecialchars($success); ?></div>
             <?php endif; ?>
 
+            <!-- Display Error Messages -->
             <?php if (!empty($errors)) : ?>
                 <div class="error-message">
                     <?php foreach ($errors as $error) {
@@ -299,6 +326,7 @@ $conn->close();
             <?php endif; ?>
 
             <div class="profile-header">
+                <!-- Profile Avatar (You can modify the src to fetch from the database if available) -->
                 <img src="Profile_Icon.png" alt="Profile Picture" class="profile-avatar">
                 <div class="profile-info">
                     <h1><?php echo htmlspecialchars($full_name); ?></h1>
@@ -306,6 +334,7 @@ $conn->close();
                 </div>
             </div>
 
+            <!-- Profile Form -->
             <form class="profile-form" method="POST" action="studentviewprofile.php">
                 <div class="form-group">
                     <label for="username">Username</label>
