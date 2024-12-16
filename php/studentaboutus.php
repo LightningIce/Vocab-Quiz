@@ -7,33 +7,33 @@
     <link rel="stylesheet" href="ProfilePage.css">
     <style>
         /* Dark Theme Color Palette */
-        :root {
-            --bg-primary: #121212;
-            --bg-secondary: #1e1e1e;
-            --text-primary: #e0e0e0;
-            --text-secondary: #a0a0a0;
-            --accent-color: #4CAF50;
-            --accent-color-hover: #45a049;
-            --border-color: #333333;
-            --shadow-color: rgba(0, 0, 0, 0.3);
-        }
+:root {
+    --bg-primary: #121212;
+    --bg-secondary: #1e1e1e;
+    --text-primary: #e0e0e0;
+    --text-secondary: #a0a0a0;
+    --accent-color: #4CAF50;
+    --accent-color-hover: #45a049;
+    --border-color: #333333;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+}
 
-        /* Reset and Base Styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: var(--text-primary);
-            background-color: var(--bg-primary);
-        }
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
+}
 
-        /* Header Styles */
-        header {
+ /* Header Styles */
+ header {
             background-color: var(--secondary-black);
             position: fixed;
             width: 100%;
@@ -142,163 +142,162 @@
         .profile-dropdown a:hover {
             background-color: rgba(255, 255, 255, 0.1);
         }
+/* Main Content Container */
+main {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    margin-top: 10rem; /* Increased top margin to create space below fixed header */
+}
 
+.profile-container {
+    background-color: var(--bg-secondary);
+    border-radius: 10px;
+    box-shadow: 0 4px 6px var(--shadow-color);
+    padding: 2rem;
+    border: 1px solid var(--border-color);
+}
 
-        /* Main Content Container */
-        main {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
+.profile-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
 
-        .profile-container {
-            background-color: var(--bg-secondary);
-            border-radius: 10px;
-            box-shadow: 0 4px 6px var(--shadow-color);
-            padding: 2rem;
-            border: 1px solid var(--border-color);
-        }
+.profile-avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 1rem;
+    filter: brightness(0) invert(1);
+}
 
-        .profile-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
+.profile-info h1 {
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
 
-        .profile-avatar {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 1rem;
-            filter: brightness(0) invert(1);
-        }
+.profile-info p {
+    color: var(--text-secondary);
+}
 
-        .profile-info h1 {
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-        }
+/* Form Styles */
+.profile-form {
+    display: flex;
+    flex-direction: column;
+}
 
-        .profile-info p {
-            color: var(--text-secondary);
-        }
+.form-group {
+    margin-bottom: 1rem;
+}
 
-        /* Form Styles */
-        .profile-form {
-            display: flex;
-            flex-direction: column;
-        }
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
 
-        .form-group {
-            margin-bottom: 1rem;
-        }
+.form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 1rem;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
 
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--text-primary);
-        }
+.btn {
+    background-color: var(--accent-color);
+    color: var(--text-primary);
+    border: none;
+    padding: 0.75rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 1rem;
+}
 
-        .form-group input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border-color);
-            border-radius: 5px;
-            font-size: 1rem;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-        }
+.btn:hover {
+    background-color: var(--accent-color-hover);
+}
 
-        .btn {
-            background-color: var(--accent-color);
-            color: var(--text-primary);
-            border: none;
-            padding: 0.75rem;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            margin-top: 1rem;
-        }
+.profile-options {
+    margin-top: 2rem;
+    text-align: center;
+}
 
-        .btn:hover {
-            background-color: var(--accent-color-hover);
-        }
+.danger-zone a {
+    color: #ff6b6b;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
 
-        .profile-options {
-            margin-top: 2rem;
-            text-align: center;
-        }
+.danger-zone a:hover {
+    color: #ff4757;
+    text-decoration: underline;
+}
 
-        .danger-zone a {
-            color: #ff6b6b;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
+/* About Page Specific Styles */
+.about-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
 
-        .danger-zone a:hover {
-            color: #ff4757;
-            text-decoration: underline;
-        }
+.about-content section {
+    background-color: var(--bg-secondary);
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px var(--shadow-color);
+    border: 1px solid var(--border-color);
+}
 
-        /* About Page Specific Styles */
-        .about-content {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
+.about-content h2 {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    border-bottom: 2px solid var(--accent-color);
+    padding-bottom: 0.5rem;
+}
 
-        .about-content section {
-            background-color: var(--bg-secondary);
-            border-radius: 10px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 4px var(--shadow-color);
-            border: 1px solid var(--border-color);
-        }
+.about-content ul {
+    list-style-type: disc;
+    padding-left: 2rem;
+    color: var(--text-secondary);
+}
 
-        .about-content h2 {
-            color: var(--text-primary);
-            margin-bottom: 1rem;
-            border-bottom: 2px solid var(--accent-color);
-            padding-bottom: 0.5rem;
-        }
+.team-members {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+}
 
-        .about-content ul {
-            list-style-type: disc;
-            padding-left: 2rem;
-            color: var(--text-secondary);
-        }
+.team-member {
+    text-align: center;
+    width: 200px;
+}
 
-        .team-members {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 1.5rem;
-        }
+.team-member img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 1rem;
+    filter: brightness(0) invert(1);
+}
 
-        .team-member {
-            text-align: center;
-            width: 200px;
-        }
+.team-member h3 {
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
 
-        .team-member img {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 1rem;
-            filter: brightness(0) invert(1);
-        }
+.team-member p {
+    color: var(--text-secondary);
+}
 
-        .team-member h3 {
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .team-member p {
-            color: var(--text-secondary);
-        }
-
-        /* Footer */
-        footer {
+/* Footer */
+footer {
             background-color: var(--secondary-black);
             padding: 3rem 5%;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -355,50 +354,23 @@
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
+/* Optional: Scrollbar Styling for Dark Theme */
+::-webkit-scrollbar {
+    width: 12px;
+}
 
-        /* Responsive Design */
-        @media screen and (max-width: 768px) {
-            nav {
-                flex-direction: column;
-            }
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
 
-            .nav-links {
-                margin-top: 1rem;
-                flex-direction: column;
-                align-items: center;
-            }
+::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 6px;
+}
 
-            .nav-links li {
-                margin: 0.5rem 0;
-            }
-
-            .footer-content {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .footer-section {
-                margin: 1rem 0;
-            }
-        }
-
-        /* Optional: Scrollbar Styling for Dark Theme */
-        ::-webkit-scrollbar {
-            width: 12px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--bg-secondary);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background-color: var(--border-color);
-            border-radius: 6px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background-color: var(--text-secondary);
-        }
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--text-secondary);
+}
     </style>
 </head>
 <body>
@@ -414,6 +386,7 @@
                 <li><a href="#about">About</a></li>
                 <li><a href="#contact">Contact</a></li>
                 <li class="profile">
+            
                     <div class="profile-toggle" onclick="toggleProfileMenu()">
                         <img src="Profile_Icon.png" alt="Profile" class="profile-icon">
                     </div>
@@ -432,7 +405,6 @@
         <div class="profile-container">
             <div class="profile-header">
                 <h1>About VocabQuiz</h1>
-                <p>Empowering Language Learners Worldwide</p>
             </div>
 
             <div class="about-content">
