@@ -4,12 +4,12 @@ require_once 'db_connect.php';
 
 session_start();
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student' || $_SESSION['role'] !== 'professional') {
+if (!isset($_SESSION['user_id']) || ($_SESSION['role'] !== 'student' && $_SESSION['role'] !== 'professional')) {
     header("Location: alllogin.php");
     exit();
 }
 
-$student_id = $_SESSION['student_id'];
+$student_id = $_SESSION['user_id'];
 
 // Fetch quiz attempts by the student
 // Using 'ua.start_time AS date_taken' to maintain the original reference

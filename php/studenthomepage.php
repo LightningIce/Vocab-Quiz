@@ -1,10 +1,11 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student' || $_SESSION['role'] !== 'professional') {
+if (!isset($_SESSION['user_id']) || ($_SESSION['role'] !== 'student' && $_SESSION['role'] !== 'professional')) {
     header("Location: alllogin.php");
     exit();
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -310,7 +311,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student' || $_SESSION
                 <a href="#start-quiz" class="cta-button">Start Quiz</a>
             </div>
             <div class="hero-image">
-                <img src="black-cat.jpg" alt="Black Cat Mascot" class="cat-image">
+                <img src="../images/icon.png" alt="Black Cat Mascot" class="cat-image">
             </div>
         </section>
 

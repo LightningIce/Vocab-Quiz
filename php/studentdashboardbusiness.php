@@ -2,10 +2,11 @@
 
 session_start();
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student' || $_SESSION['role'] !== 'professional') {
+if (!isset($_SESSION['user_id']) || ($_SESSION['role'] !== 'student' && $_SESSION['role'] !== 'professional')) {
     header("Location: alllogin.php");
     exit();
 }
+
 
 require_once 'db_connect.php';
 
