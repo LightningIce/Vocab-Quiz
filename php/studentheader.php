@@ -7,8 +7,8 @@
                 VocabQuiz
             </div>
             <ul class="nav-links">
-                <li><a href="HomePage.html">Home</a></li>
-                <li><a href="#quizzes">Quizzes</a></li>
+                <li><a href="studenthomepage.php">Home</a></li>
+                <li><a href="studentquizquestion.php">Quizzes</a></li>
                 <li><a href="#about">About</a></li>
                 <li><a href="#contact">Contact</a></li>
                 <li class="profile">
