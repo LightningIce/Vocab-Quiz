@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['role'] !== 'student' && $_SESSIO
     exit();
 }
 
-$student_id = $_SESSION['student_id'];
+$student_id = $_SESSION['user_id'];
 
 if (!isset($_GET['quiz_id'])) {
     die("Quiz ID not specified.");

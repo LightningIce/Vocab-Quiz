@@ -4,12 +4,12 @@ header('Content-Type: application/json');
 
 require_once 'db_connect.php';
 
-if (!isset($_SESSION['student_id']) || $_SESSION['role'] !== 'student') {
-    echo json_encode(['success' => false, 'message' => 'Unauthorized access.']);
+if (!isset($_SESSION['user_id']) || ($_SESSION['role'] !== 'student' && $_SESSION['role'] !== 'professional')) {
+    header("Location: alllogin.php");
     exit();
 }
 
-$student_id = $_SESSION['student_id'];
+$student_id = $_SESSION['user_id'];
 
 $data = json_decode(file_get_contents('php://input'), true);
 
