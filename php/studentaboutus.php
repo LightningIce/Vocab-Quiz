@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us - VocabQuiz</title>
-    <link rel="stylesheet" href="ProfilePage.css">
+    <link rel="stylesheet" href="../css/student.css">
     <style>
         /* Dark Theme Color Palette */
 :root {
@@ -33,115 +33,7 @@ body {
 }
 
  /* Header Styles */
- header {
-            background-color: var(--secondary-black);
-            position: fixed;
-            width: 100%;
-            top: 0;
-            left: 0;
-            z-index: 1000;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
-        }
-
-        /* Navigation */
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 5%;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--text-white);
-        }
-
-        .logo img {
-            height: 40px;
-            margin-right: 10px;
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        .nav-links a {
-            color: var(--text-white);
-            text-decoration: none;
-            transition: color 0.3s ease;
-            position: relative;
-            padding: 10px 0;
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: 0;
-            left: 0;
-            background-color: var(--accent-color);
-            transition: width 0.3s ease;
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-        /* Profile Dropdown */
-        .profile {
-            position: relative;
-        }
-
-        .profile-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .profile-icon:hover {
-            transform: scale(1.1);
-        }
-
-        .profile-dropdown {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 100%;
-            background-color: var(--secondary-black);
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1);
-            min-width: 200px;
-            padding: 10px;
-            z-index: 1100;
-        }
-
-        .profile-dropdown.active {
-            display: block;
-        }
-
-        .profile-dropdown a {
-            display: block;
-            color: var(--text-white);
-            padding: 10px;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
-        }
-
-        .profile-dropdown a:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
+ 
 /* Main Content Container */
 main {
     max-width: 800px;
@@ -297,63 +189,6 @@ main {
 }
 
 /* Footer */
-footer {
-            background-color: var(--secondary-black);
-            padding: 3rem 5%;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .footer-content {
-            display: flex;
-            justify-content: space-between;
-            gap: 2rem;
-        }
-
-        .footer-section {
-            flex: 1;
-        }
-
-        .footer-section h3 {
-            color: var(--text-white);
-            margin-bottom: 1rem;
-        }
-
-        .footer-section ul {
-            list-style: none;
-        }
-
-        .footer-section ul li a {
-            color: var(--accent-color);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .footer-section ul li a:hover {
-            color: var(--hover-color);
-        }
-
-        .social-links {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .social-icon {
-            color: var(--accent-color);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .social-icon:hover {
-            color: var(--hover-color);
-        }
-
-        .footer-bottom {
-            text-align: center;
-            margin-top: 2rem;
-            padding-top: 1rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
 /* Optional: Scrollbar Styling for Dark Theme */
 ::-webkit-scrollbar {
     width: 12px;
@@ -374,32 +209,7 @@ footer {
     </style>
 </head>
 <body>
-    <header>
-        <nav>
-            <div class="logo">
-                <img src="icon.png" alt="VocabQuiz Logo">
-                VocabQuiz
-            </div>
-            <ul class="nav-links">
-                <li><a href="HomePage.html">Home</a></li>
-                <li><a href="#quizzes">Quizzes</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
-                <li class="profile">
-            
-                    <div class="profile-toggle" onclick="toggleProfileMenu()">
-                        <img src="Profile_Icon.png" alt="Profile" class="profile-icon">
-                    </div>
-                    <div class="profile-dropdown">
-                        <a href="#profile">My Profile</a>
-                        <a href="#history">Quiz History</a>
-                        <a href="#settings">Settings</a>
-                        <a href="#logout">Logout</a>
-                    </div>
-                </li>
-            </ul>
-        </nav>
-    </header>
+<?php include 'studentheader.php'?>
 
     <main>
         <div class="profile-container">
@@ -463,34 +273,7 @@ footer {
         </div>
     </main>
 
-    <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>About VocabQuiz</h3>
-                <p>Empowering language learners through interactive and personalized vocabulary quizzes.</p>
-            </div>
-            <div class="footer-section">
-                <h3>Quick Links</h3>
-                <ul>
-                    <li><a href="#home">Home</a></li>
-                    <li><a href="#quizzes">Quizzes</a></li>
-                    <li><a href="#about">About Us</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h3>Connect With Us</h3>
-                <div class="social-links">
-                    <a href="#" class="social-icon">Twitter</a>
-                    <a href="#" class="social-icon">LinkedIn</a>
-                    <a href="#" class="social-icon">Instagram</a>
-                </div>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2024 VocabQuiz. All Rights Reserved.</p>
-        </div>
-    </footer>
+    <?php include 'studentfooter.php'?>
 
     <script>
         // Reuse profile menu toggle from homepage
