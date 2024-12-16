@@ -75,6 +75,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['addQuestion'])) {
     echo "<script>alert('Question added successfully!'); window.location.href = 'adminquizadd.php?quiz_id=$quizId';</script>";
     exit;
 }
+
+// Handle Done Action
+if (isset($_GET['done']) && isset($_GET['quiz_id'])) {
+    echo "<script>alert('You have finished adding questions!'); window.location.href = 'dashboard.php';</script>";
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -112,6 +118,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['addQuestion'])) {
         }
         button:hover {
             background-color: #218838;
+        }
+        .done-btn {
+            background-color: #007bff;
+            margin-top: 20px;
+        }
+        .done-btn:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
@@ -168,6 +181,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['addQuestion'])) {
             </select>
 
             <button type="submit">Add Question</button>
+        </form>
+        <form action="adminquizadd.php" method="GET">
+            <input type="hidden" name="done" value="1">
+            <input type="hidden" name="quiz_id" value="<?php echo $_GET['quiz_id']; ?>">
+            <button type="submit" class="done-btn">Done</button>
         </form>
         <?php endif; ?>
     </div>
