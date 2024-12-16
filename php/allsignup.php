@@ -12,9 +12,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $confirm_password = trim($_POST["confirm_password"]);
     $full_name = trim($_POST["full_name"]);
     $email = trim($_POST["email"]);
+    $role = trim($_POST["role"]);
 
     // Validate inputs
-    if (empty($username) || empty($password) || empty($confirm_password) || empty($full_name) || empty($email)) {
+    if (empty($username) || empty($password) || empty($confirm_password) || empty($full_name) || empty($email) || empty($role)) {
         $error = "All fields are required.";
     } elseif ($password !== $confirm_password) {
         $error = "Passwords do not match.";
@@ -28,14 +29,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if ($stmt->num_rows > 0) {
             $error = "Username or Email already exists.";
         } else {
-            // Hash the password
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            // Insert new user
-            $insert_stmt = $conn->prepare("INSERT INTO users (username, password, full_name, email, role) VALUES (?, ?, ?, ?, 'student')");
-            $insert_stmt->bind_param("ssss", $username, $hashed_password, $full_name, $email);
+            // *No password hashing* (Not recommended in real scenarios)
+            $insert_stmt = $conn->prepare("INSERT INTO users (username, password, full_name, email, role) VALUES (?, ?, ?, ?, ?)");
+            $insert_stmt->bind_param("sssss", $username, $password, $full_name, $email, $role);
 
             if ($insert_stmt->execute()) {
-                $success = "Registration successful. You can now <a href='login.php'>login</a>.";
+                $success = "Registration successful. You can now <a href='alllogin.php'>login</a>.";
             } else {
                 $error = "Error in registration. Please try again.";
             }
@@ -72,7 +71,7 @@ $conn->close();
             display: flex;
             align-items: center;
             justify-content: center;
-            background-image: url(cat.jpg);
+            background-image: url(../images/cat.jpg);
             background-size: cover;
             background-position: center;
         }
@@ -98,7 +97,7 @@ $conn->close();
             margin: 20px 0;
             position: relative;
         }
-        .input-box input {
+        .input-box input, .input-box select {
             width: 100%;
             background: rgba(255, 255, 255, 0.1);
             border: none;
@@ -109,13 +108,17 @@ $conn->close();
             font-size: 17px;
             color: white;
             font-weight: 600;
+            appearance: none; /* For select styling */
         }
         .input-box input::placeholder {
             color: rgba(255, 255, 255, 0.8);
             font-size: 17px;
             font-weight: 500;
         }
-        .input-box input:focus {
+        .input-box select {
+            color: white;
+        }
+        .input-box input:focus, .input-box select:focus {
             outline: 3px solid rgba(255, 255, 255, 0.3);
         }
         .input-box input::-ms-reveal {
@@ -171,11 +174,17 @@ $conn->close();
         .register a:hover {
             text-decoration: underline;
         }
+
+        /* Custom arrow for the select dropdown */
+        .input-box select {
+            background: rgba(0, 0, 0, 0.1) url('data:image/svg+xml;utf8,<svg fill="white" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"></path></svg>') no-repeat right 15px center;
+            background-size: 20px 20px;
+        }
     </style>
 </head>
 <body>
     
-    <form action="register.php" method="POST" class="register-form">
+    <form action="allsignup.php" method="POST" class="register-form">
         <h1 class="register-title">Register</h1>
 
         <?php if(!empty($error)): ?>
@@ -206,12 +215,21 @@ $conn->close();
             <i class='bx bxs-lock-alt'></i>
             <input type="password" name="confirm_password" placeholder="Confirm Password" required>
         </div>
+        <div class="input-box">
+            <i class='bx bxs-user'></i>
+            <select name="role" required>
+                <option value="" disabled selected>Select Role</option>
+                <option value="student">Student</option>
+                <option value="professionals">Professionals</option>
+                <option value="admin">Admin</option>
+            </select>
+        </div>
 
         <button class="register-btn" type="submit">Register</button>
 
         <p class="register">
             Have an account?
-            <a href="login.php">Login</a>
+            <a href="alllogin.php">Login</a>
         </p>
     </form>
 

@@ -270,7 +270,7 @@ $conn->close();
 
         <p class="register">
             Don't have an account?
-            <a href="Register.html">Register</a>
+            <a href="allsignup.php">Register</a>
         </p>
     </form>
 </body>
