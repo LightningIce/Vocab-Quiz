@@ -7,10 +7,10 @@
         <div class="footer-section">
             <h3>Quick Links</h3>
             <ul>
-                <li><a href="#home">Home</a></li>
-                <li><a href="#quizzes">Quizzes</a></li>
-                <li><a href="#about">About Us</a></li>
-                <li><a href="#contact">Contact</a></li>
+                <li><a href="studenthomepage.php">Home</a></li>
+                <li><a href="studentdashboard">Quizzes</a></li>
+                <li><a href="studentaboutus.php">About Us</a></li>
+                <li><a href="studentcontactus.php">Contact</a></li>
             </ul>
         </div>
         <div class="footer-section">
