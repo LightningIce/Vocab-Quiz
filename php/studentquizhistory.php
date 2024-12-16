@@ -1,12 +1,11 @@
 <?php
 // studentquizhistory.php
-
-session_start();
 require_once 'db_connect.php';
 
-// Check if the student is logged in
-if (!isset($_SESSION['student_id']) || $_SESSION['role'] !== 'student') {
-    header("Location: alllogin.php"); // Redirect to login page if not logged in
+session_start();
+
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student' || $_SESSION['role'] !== 'professional') {
+    header("Location: alllogin.php");
     exit();
 }
 

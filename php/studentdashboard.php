@@ -1,9 +1,10 @@
 <?php
 session_start();
 
-// Temporary: Simulate a logged-in student
-$_SESSION['student_id'] = 1; // Replace with the actual user_id of the test user
-$_SESSION['role'] = 'student';
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student' || $_SESSION['role'] !== 'professional') {
+    header("Location: alllogin.php");
+    exit();
+}
 
 require_once 'db_connect.php';
 
