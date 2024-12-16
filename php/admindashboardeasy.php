@@ -18,18 +18,15 @@ if ($stmt === false) {
     die("An unexpected error occurred. Please try again later.");
 }
 
-// Bind parameters and execute the statement
 $stmt->bind_param("i", $admin_user_id);
 if (!$stmt->execute()) {
-    // Log the error and handle it gracefully
     error_log("Execute failed: " . htmlspecialchars($stmt->error));
     die("An unexpected error occurred. Please try again later.");
 }
 
-// Get the result
 $result = $stmt->get_result();
 
-$phpQuizzes = []; // Initialize the quizzes array
+$phpQuizzes = [];
 
 if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
@@ -42,11 +39,9 @@ if ($result && $result->num_rows > 0) {
     }
 }
 
-// Close the statement and database connection
 $stmt->close();
 $conn->close();
 
-// Encode the quizzes array to JSON safely
 $quizzesJson = json_encode($phpQuizzes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 ?>
 <!DOCTYPE html>
@@ -299,7 +294,6 @@ $quizzesJson = json_encode($phpQuizzes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_A
             <h2 id="modal-title">Quiz Title</h2>
             <p id="modal-description">Quiz Description</p>
 
-            <!-- New Buttons -->
             <div class="modal-actions">
                 <button class="modal-button review-edit" aria-label="Review and Edit">Review and Edit</button>
                 <button class="modal-button report-statistics" aria-label="Report and Statistics">Report and Statistics</button>

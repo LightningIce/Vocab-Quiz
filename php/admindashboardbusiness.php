@@ -1,53 +1,31 @@
 <?php
 // admindashboardbusiness.php
-
-// Enable error reporting for development (Disable in production)
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-// Secure session cookie parameters (Ensure HTTPS is used)
-ini_set('session.cookie_secure', '1'); // Set to '1' if using HTTPS
-ini_set('session.cookie_httponly', '1');
-ini_set('session.cookie_samesite', 'Strict');
-
-// Start the session
 session_start();
 
-// Check if the user is logged in and is an admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    // Optionally, store the original page to redirect after login
-    $_SESSION['redirect_to'] = 'admindashboardbusiness.php';
     header("Location: alllogin.php");
     exit();
 }
 
-// Include the database connection script
 require_once 'db_connect.php';
 
-// Get the admin's user_id from session
 $admin_user_id = $_SESSION['user_id'];
 
-// Prepare the SQL statement to fetch Business quizzes created by the admin
 $stmt = $conn->prepare("SELECT quiz_id, quiz_title, description, category FROM quizzes WHERE created_by = ? AND category = 'Business'");
 if ($stmt === false) {
-    // Log the error and handle it gracefully
     error_log("Prepare failed: " . htmlspecialchars($conn->error));
     die("An unexpected error occurred. Please try again later.");
 }
 
-// Bind parameters and execute the statement
 $stmt->bind_param("i", $admin_user_id);
 if (!$stmt->execute()) {
-    // Log the error and handle it gracefully
     error_log("Execute failed: " . htmlspecialchars($stmt->error));
     die("An unexpected error occurred. Please try again later.");
 }
 
-// Get the result
 $result = $stmt->get_result();
 
-$phpQuizzes = []; // Initialize the quizzes array
+$phpQuizzes = [];
 
 if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
@@ -60,11 +38,9 @@ if ($result && $result->num_rows > 0) {
     }
 }
 
-// Close the statement and database connection
 $stmt->close();
 $conn->close();
 
-// Encode the quizzes array to JSON safely
 $quizzesJson = json_encode($phpQuizzes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 ?>
 <!DOCTYPE html>
@@ -319,7 +295,6 @@ $quizzesJson = json_encode($phpQuizzes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_A
             <h2 id="modal-title">Quiz Title</h2>
             <p id="modal-description">Quiz Description</p>
 
-            <!-- New Buttons -->
             <div class="modal-actions">
                 <button class="modal-button review-edit" aria-label="Review and Edit">Review and Edit</button>
                 <button class="modal-button report-statistics" aria-label="Report and Statistics">Report and Statistics</button>
