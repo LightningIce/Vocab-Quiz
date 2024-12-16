@@ -208,7 +208,7 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['role'] !== 'student' && $_SESSIO
             <div class="hero-content">
                 <h1>Master Your Vocabulary</h1>
                 <p>Personalized quizzes to enhance your language skills</p>
-                <a href="#start-quiz" class="cta-button">Start Quiz</a>
+                <a href="studentdashboard.php" class="cta-button">Start Quiz</a>
             </div>
             <div class="hero-image">
                 <img src="../images/icon.png" alt="Black Cat Mascot" class="cat-image">
@@ -229,7 +229,7 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['role'] !== 'student' && $_SESSIO
                 <h2>Academic English</h2>
                 <p>Comprehensive Vocabulary Test</p>
                 <div class="quiz-stats">
-                    <a href="studentquizhistoryeasy.php"><button>Start Quiz</button></a>
+                    <a href="studentdashboardeasy.php"><button>Start Quiz</button></a>
                 </div>
             </div>
 
