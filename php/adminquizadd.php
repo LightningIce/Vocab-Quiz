@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Validate Input
     if (!$quizName || !$description || !$difficulty || !$questionText || !$optionA || !$optionB || !$optionC || !$optionD || !$correctAnswer) {
-        die("<script>alert('All fields are required.'); window.location.href = 'add-question.php';</script>");
+        die("<script>alert('All fields are required.'); window.location.href = 'adminquizadd.php';</script>");
     }
 
     // Insert Quiz into `quizzes` Table (if it doesn't already exist)
@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->close();
     $conn->close();
 
-    echo "<script>alert('Question added successfully!'); window.location.href = 'add-question.php';</script>";
+    echo "<script>alert('Question added successfully!'); window.location.href = 'adminquizadd.php';</script>";
     exit;
 }
 ?>
@@ -108,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <div class="container">
         <h2>Add New Question</h2>
-        <form action="add-question.php" method="POST">
+        <form action="adminquizadd.php" method="POST">
             <label>Quiz Name</label>
             <input type="text" name="quizName" placeholder="Enter quiz name" required>
 
