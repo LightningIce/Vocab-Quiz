@@ -11,12 +11,31 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Handle Form Submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Collect Form Data
+// Handle Quiz Creation
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['createQuiz'])) {
     $quizName = $_POST['quizName'];
     $description = $_POST['description'];
     $difficulty = $_POST['difficulty'];
+
+    if (!$quizName || !$description || !$difficulty) {
+        die("<script>alert('All fields are required to create a quiz.'); window.location.href = 'adminquizadd.php';</script>");
+    }
+
+    // Insert Quiz into `quizzes` Table
+    $stmt = $conn->prepare("INSERT INTO quizzes (quiz_title, description, category, created_by) VALUES (?, ?, ?, 1)");
+    $stmt->bind_param("sss", $quizName, $description, $difficulty);
+    $stmt->execute();
+
+    $quizId = $conn->insert_id;
+    $stmt->close();
+
+    echo "<script>alert('Quiz created successfully! You can now add questions to it.'); window.location.href = 'adminquizadd.php?quiz_id=$quizId';</script>";
+    exit;
+}
+
+// Handle Question Addition
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['addQuestion'])) {
+    $quizId = $_POST['quizId'];
     $questionText = $_POST['question'];
     $optionA = $_POST['optionA'];
     $optionB = $_POST['optionB'];
@@ -24,16 +43,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $optionD = $_POST['optionD'];
     $correctAnswer = $_POST['correctAnswer'];
 
-    // Validate Input
-    if (!$quizName || !$description || !$difficulty || !$questionText || !$optionA || !$optionB || !$optionC || !$optionD || !$correctAnswer) {
-        die("<script>alert('All fields are required.'); window.location.href = 'adminquizadd.php';</script>");
+    if (!$quizId || !$questionText || !$optionA || !$optionB || !$optionC || !$optionD || !$correctAnswer) {
+        die("<script>alert('All fields are required to add a question.'); window.location.href = 'adminquizadd.php?quiz_id=$quizId';</script>");
     }
-
-    // Insert Quiz into `quizzes` Table (if it doesn't already exist)
-    $stmt = $conn->prepare("INSERT INTO quizzes (quiz_title, description, category, created_by) VALUES (?, ?, ?, 1) ON DUPLICATE KEY UPDATE quiz_id=LAST_INSERT_ID(quiz_id)");
-    $stmt->bind_param("sss", $quizName, $description, $difficulty);
-    $stmt->execute();
-    $quizId = $conn->insert_id;
 
     // Insert Question into `questions` Table
     $stmt = $conn->prepare("INSERT INTO questions (quiz_id, question_text) VALUES (?, ?)");
@@ -58,11 +70,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bind_param("ii", $correctOptionId, $questionId);
     $stmt->execute();
 
-    // Close Statement and Connection
     $stmt->close();
-    $conn->close();
 
-    echo "<script>alert('Question added successfully!'); window.location.href = 'adminquizadd.php';</script>";
+    echo "<script>alert('Question added successfully!'); window.location.href = 'adminquizadd.php?quiz_id=$quizId';</script>";
     exit;
 }
 ?>
@@ -72,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add New Question</title>
+    <title>Add Quiz or Questions</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -107,8 +117,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <div class="container">
-        <h2>Add New Question</h2>
+        <?php if (!isset($_GET['quiz_id'])): ?>
+        <!-- Quiz Creation Form -->
+        <h2>Create New Quiz</h2>
         <form action="adminquizadd.php" method="POST">
+            <input type="hidden" name="createQuiz" value="1">
             <label>Quiz Name</label>
             <input type="text" name="quizName" placeholder="Enter quiz name" required>
 
@@ -121,6 +134,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <option value="hard">Hard</option>
                 <option value="business">Business</option>
             </select>
+
+            <button type="submit">Create Quiz</button>
+        </form>
+        <?php else: ?>
+        <!-- Question Addition Form -->
+        <h2>Add Question to Quiz</h2>
+        <form action="adminquizadd.php" method="POST">
+            <input type="hidden" name="addQuestion" value="1">
+            <input type="hidden" name="quizId" value="<?php echo $_GET['quiz_id']; ?>">
 
             <label>Question</label>
             <textarea name="question" placeholder="Enter question" required></textarea>
@@ -145,8 +167,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <option value="D">D</option>
             </select>
 
-            <button type="submit">Submit</button>
+            <button type="submit">Add Question</button>
         </form>
+        <?php endif; ?>
     </div>
 </body>
 </html>
