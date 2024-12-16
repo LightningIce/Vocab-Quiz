@@ -1,3 +1,33 @@
+/* student.css */
+
+:root {
+    --primary-black: #121212;
+    --secondary-black: #1e1e1e;
+    --text-white: #f4f4f4;
+    --accent-color: #e0e0e0;
+    --hover-color: #ffffff;
+    --orange-accent: #ff9800;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--primary-black);
+    color: var(--text-white);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* Header Styles */
 header {
     background-color: var(--secondary-black);
     position: fixed;
@@ -80,7 +110,7 @@ nav {
 }
 
 .profile-dropdown {
-    display: none;
+    display: none;  
     position: absolute;
     right: 0;
     top: 100%;
@@ -108,6 +138,8 @@ nav {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
+
+/* Footer */
 footer {
     background-color: var(--secondary-black);
     padding: 3rem 5%;
@@ -160,7 +192,6 @@ footer {
 
 .footer-bottom {
     text-align: center;
-    margin-top: 2rem;
-    padding-top: 1rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 2rem;
+    color: var(--accent-color);
 }

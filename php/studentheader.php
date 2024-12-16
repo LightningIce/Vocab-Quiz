@@ -1,8 +1,10 @@
-<header>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <header>
         <nav>
             <div class="logo">
-                <img src="../images/icon.png" alt="VocabQuiz Logo">
-                VocabQuiz
+                <a href="studenthomepage.php"><img src="../images/icon.png" alt="VocabQuiz Logo">
+                </a>VocabQuiz
             </div>
             <ul class="nav-links">
                 <li><a href="studenthomepage.php">Home</a></li>

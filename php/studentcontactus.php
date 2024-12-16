@@ -20,6 +20,7 @@
 
         /* Main Content Spacing */
         main {
+            background-color: #121212;
             padding-top: 120px; /* Increased top padding to prevent header overlap */
             padding-bottom: 60px; /* Added bottom padding for more breathing room */
             min-height: calc(100vh - 300px); /* Ensure main content takes up remaining viewport height */
