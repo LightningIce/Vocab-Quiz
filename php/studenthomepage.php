@@ -14,6 +14,7 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['role'] !== 'student' && $_SESSIO
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VocabQuiz - Enhance Your Language Skills</title>
+    <link rel="stylesheet" href="../css/student.css">
     <style>
         :root {
             --primary-black: #121212;
@@ -34,107 +35,6 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['role'] !== 'student' && $_SESSIO
             background-color: var(--primary-black);
             color: var(--text-white);
             line-height: 1.6;
-        }
-
-        /* Navigation Styles */
-        header {
-            background-color: var(--secondary-black);
-            padding: 1rem 5%;
-            box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--text-white);
-        }
-
-        .logo img {
-            height: 40px;
-            margin-right: 10px;
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            color: var(--text-white);
-            text-decoration: none;
-            transition: color 0.3s ease;
-            position: relative;
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: -5px;
-            left: 0;
-            background-color: var(--accent-color);
-            transition: width 0.3s ease;
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-        .profile {
-            position: relative;
-        }
-
-        .profile-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .profile-icon:hover {
-            transform: scale(1.1);
-        }
-
-        .profile-dropdown {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 100%;
-            background-color: var(--secondary-black);
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1);
-            min-width: 200px;
-            padding: 10px;
-        }
-
-        .profile-dropdown.active {
-            display: block;
-        }
-
-        .profile-dropdown a {
-            display: block;
-            color: var(--text-white);
-            padding: 10px;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
-        }
-
-        .profile-dropdown a:hover {
-            background-color: rgba(255, 255, 255, 0.1);
         }
 
         /* Hero Section */
