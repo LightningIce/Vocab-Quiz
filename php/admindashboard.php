@@ -388,6 +388,10 @@ $quizzesJson = json_encode($phpQuizzes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_A
                 takeQuizButton.onclick = () => {
                     window.location.href = `adminquizedit.php?quiz_id=${quiz.id}`;
                 };
+                const takeQuizButton2 = document.querySelector('.modal-button.report-statistics');
+                takeQuizButton2.onclick = () => {
+                    window.location.href = `adminreport.php?quiz_id=${quiz.id}`;
+                };
                 modal.setAttribute('aria-hidden', 'false');
                 modal.querySelector('.close-button').focus();
             }

@@ -34,12 +34,11 @@
         <div class="admin-dropdown-container">
             <button class="admin-dropdown-button" aria-label="Toggle navigation" aria-expanded="false">
                 <i class="fas fa-bars" aria-hidden="true"></i>
-                <i class="fas fa-times" aria-hidden="true"></i>
             </button>
             <div class="admin-dropdown">
                 <ul class="admin-dropdown-items">
                     <li>
-                        <a href="allaccount.php">
+                        <a href="adminviewprofile.php">
                             <span class="admin-dropdown-profile-icon"><i class="fas fa-user" aria-hidden="true"></i></span>
                             <span>Profile</span>
                         </a>

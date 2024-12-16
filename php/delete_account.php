@@ -4,7 +4,7 @@
 session_start();
 
 // Check if the user is logged in and has the appropriate role
-if (!isset($_SESSION['user_id']) || ($_SESSION['role'] !== 'student' && $_SESSION['role'] !== 'professional')) {
+if (!isset($_SESSION['user_id'])) {
     header("Location: alllogin.php");
     exit();
 }
@@ -45,11 +45,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $delete_stmt->bind_param("i", $user_id);
                         if ($delete_stmt->execute()) {
                             $delete_stmt->close();
-                            
+
                             // Destroy the session
                             session_unset();
                             session_destroy();
-                            
+
                             // Redirect to goodbye page
                             header("Location: goodbye.php");
                             exit();
