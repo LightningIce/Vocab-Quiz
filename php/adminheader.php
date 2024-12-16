@@ -45,7 +45,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="alllogin.php">
+                        <a href="logout.php">
                             <span><i class="fas fa-sign-out-alt" aria-hidden="true"></i></span>
                             <span>Log Out</span>
                         </a>

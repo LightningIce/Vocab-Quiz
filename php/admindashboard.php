@@ -1,10 +1,41 @@
 <?php
+// admindashboard.php
+
+session_start();
+
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    // Optionally, store the original page to redirect after login
+    $_SESSION['redirect_to'] = 'admindashboard.php';
+    header("Location: alllogin.php");
+    exit();
+}
+
+// Include the database connection script
 require_once 'db_connect.php';
 
-$sql = "SELECT quiz_id, quiz_title, description, category FROM quizzes";
-$result = $conn->query($sql);
+// Get the admin's user_id from session
+$admin_user_id = $_SESSION['user_id'];
 
-$quizzes = [];
+// Prepare the SQL statement to fetch quizzes created by the admin
+$stmt = $conn->prepare("SELECT quiz_id, quiz_title, description, category FROM quizzes WHERE created_by = ?");
+if ($stmt === false) {
+    // Log the error and handle it gracefully
+    error_log("Prepare failed: " . htmlspecialchars($conn->error));
+    die("An unexpected error occurred. Please try again later.");
+}
+
+// Bind parameters and execute the statement
+$stmt->bind_param("i", $admin_user_id);
+if (!$stmt->execute()) {
+    // Log the error and handle it gracefully
+    error_log("Execute failed: " . htmlspecialchars($stmt->error));
+    die("An unexpected error occurred. Please try again later.");
+}
+
+// Get the result
+$result = $stmt->get_result();
+
+$phpQuizzes = []; // Initialize the quizzes array
 
 if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
@@ -17,10 +48,12 @@ if ($result && $result->num_rows > 0) {
     }
 }
 
+// Close the statement and database connection
+$stmt->close();
 $conn->close();
 
+// Encode the quizzes array to JSON safely
 $quizzesJson = json_encode($phpQuizzes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -33,6 +66,7 @@ $quizzesJson = json_encode($phpQuizzes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_A
     <link rel="stylesheet" href="../css/adminheader.css">
     <link rel="stylesheet" href="../css/font-awesome.css">
     <style>
+        /* Existing styles */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -117,6 +151,8 @@ $quizzesJson = json_encode($phpQuizzes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_A
             outline: none;
             transform: translateY(-5px);
         }
+
+        /* Modal and other styles remain unchanged */
 
         .admin-dropdown {
             display: none;
@@ -210,7 +246,6 @@ $quizzesJson = json_encode($phpQuizzes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_A
             outline: none;
             transform: translateY(-2px);
         }
-
 
         .close-button {
             color: #aaa;
