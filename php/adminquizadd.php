@@ -29,7 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['createQuiz'])) {
     $quizId = $conn->insert_id;
     $stmt->close();
 
-    echo "<script>alert('Quiz created successfully! You can now add questions to it.'); window.location.href = 'adminquizadd.php?quiz_id=$quizId';</script>";
+    echo "<script>alert('Quiz created successfully! You can now add questions to it.'); window.location.href =
+    'adminquizadd.php?quiz_id=$quizId';</script>";
     exit;
 }
 
