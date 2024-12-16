@@ -281,30 +281,30 @@ $questions = array_values($questions);
             $qid = $question['question_id'];
             $chosen_option_id = isset($user_answers[$qid]['chosen_option_id']) ? $user_answers[$qid]['chosen_option_id'] : null;
             $correct_option_id = $user_answers[$qid]['correct_option_id'];
-            ?>
+        ?>
             <div class="question-review">
                 <h2>Q: <?php echo htmlspecialchars($question['question_text']); ?></h2>
                 <ul class="options">
                     <?php foreach ($question['options'] as $option):
                         $is_correct = $option['option_id'] === $correct_option_id;
                         $is_student_answer = $option['option_id'] === $chosen_option_id;
-                        ?>
-                        <li 
-                            class="<?php 
-                                if ($is_correct) echo 'correct'; 
-                                if ($is_student_answer && !$is_correct) echo 'incorrect'; 
-                                if ($is_student_answer) echo ' student-answer';
-                            ?>">
+                    ?>
+                        <li
+                            class="<?php
+                                    if ($is_correct) echo 'correct';
+                                    if ($is_student_answer && !$is_correct) echo 'incorrect';
+                                    if ($is_student_answer) echo ' student-answer';
+                                    ?>">
                             <?php echo htmlspecialchars($option['option_text']); ?>
-                            <?php 
-                                if ($is_correct) echo ' <strong>(Correct Answer)</strong>';
-                                if ($is_student_answer) {
-                                    if ($is_correct) {
-                                        echo ' <strong>(Your Answer - Correct)</strong>';
-                                    } else {
-                                        echo ' <strong>(Your Answer - Incorrect)</strong>';
-                                    }
+                            <?php
+                            if ($is_correct) echo ' <strong>(Correct Answer)</strong>';
+                            if ($is_student_answer) {
+                                if ($is_correct) {
+                                    echo ' <strong>(Your Answer - Correct)</strong>';
+                                } else {
+                                    echo ' <strong>(Your Answer - Incorrect)</strong>';
                                 }
+                            }
                             ?>
                         </li>
                     <?php endforeach; ?>
@@ -314,10 +314,10 @@ $questions = array_values($questions);
 
         <div class="buttons">
             <a href="studentdashboard.php">Back to Dashboard</a>
-            <!-- Updated "View Another Attempt" to "Try Again" -->
             <a href="studentquizquestion.php?quiz_id=<?php echo urlencode($attempt['quiz_id']); ?>">Try Again</a>
         </div>
     </div>
+    <script src="../js/studentHeader.js"></script>
 </body>
 
 </html>

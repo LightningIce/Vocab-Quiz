@@ -389,6 +389,8 @@ footer {
             <p>&copy; 2024 VocabQuiz. All Rights Reserved.</p>
         </div>
     </footer>
+    
+    <script src="../js/studentHeader.js"></script>
     <script>
         // Toggle profile dropdown menu
 function toggleProfileMenu() {

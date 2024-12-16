@@ -278,6 +278,7 @@ $quizzesJson = json_encode($phpQuizzes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_A
         </div>
     </div>
 
+    <script src="../js/studentHeader.js"></script>
     <script>
         <?php print "var quizzesFromDB = $quizzesJson;" ?>
         document.addEventListener('DOMContentLoaded', () => {

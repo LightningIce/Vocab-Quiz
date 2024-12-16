@@ -149,6 +149,7 @@ $conn->close();
         <a href="studentdashboard.php">Back to Dashboard</a>
         <a href="studentreviewquiz.php?attempt_id=<?php echo urlencode($attempt_id); ?>">Review Quiz</a>
     </div>
+    <script src="../js/studentHeader.js"></script>
 </body>
 
 </html>

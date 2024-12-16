@@ -254,6 +254,7 @@ $questions_json = json_encode($questions, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX
         <img src="../images/questions.png" alt="question" class="question-img">
     </div>
 
+    <script src="../js/studentHeader.js"></script>
     <script>
         const questions = <?php echo $questions_json; ?>;
 

@@ -175,7 +175,6 @@ $conn->close();
                             <td><?php echo htmlspecialchars($attempt['category'] ?? 'N/A'); ?></td>
                             <td>
                                 <?php 
-                                    // Handle NULL scores
                                     if (is_null($attempt['score'])) {
                                         echo 'In Progress';
                                     } else {
@@ -185,7 +184,6 @@ $conn->close();
                             </td>
                             <td>
                                 <?php 
-                                    // Handle NULL dates if any (though start_time is NOT NULL)
                                     echo htmlspecialchars(date("F j, Y, g:i a", strtotime($attempt['date_taken'] ?? 'N/A')));
                                 ?>
                             </td>
@@ -213,6 +211,7 @@ $conn->close();
     </div>
 
     <?php include 'studentfooter.php'; ?>
+    <script src="../js/studentHeader.js"></script>
 </body>
 
 </html>

@@ -693,5 +693,6 @@ footer {
             alert('Profile updated successfully!');
         });
     </script>
+        <script src="../js/studentHeader.js"></script>
 </body>
 </html>
