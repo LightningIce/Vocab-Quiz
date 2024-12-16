@@ -1,45 +1,109 @@
+<?php
+
+$host = 'localhost';
+$db   = 'vocabquiz';
+$user = 'root';
+$pass = '';
+
+
+$conn = new mysqli($host, $user, $pass, $db);
+
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+
+$quiz_id = 1;
+
+
+$quiz_sql = "SELECT quiz_title FROM quizzes WHERE quiz_id = ?";
+$stmt = $conn->prepare($quiz_sql);
+$stmt->bind_param("i", $quiz_id);
+$stmt->execute();
+$quiz_result = $stmt->get_result();
+$quiz = $quiz_result->fetch_assoc();
+$stmt->close();
+
+if (!$quiz) {
+    die("Quiz not found.");
+}
+
+
+$question_sql = "
+    SELECT q.question_id, q.question_text, q.correct_option_id
+    FROM questions q
+    WHERE q.quiz_id = ?
+    ORDER BY q.question_id ASC
+";
+$stmt = $conn->prepare($question_sql);
+$stmt->bind_param("i", $quiz_id);
+$stmt->execute();
+$question_result = $stmt->get_result();
+
+$questions = [];
+while ($row = $question_result->fetch_assoc()) {
+    $questions[] = $row;
+}
+$stmt->close();
+
+$total_questions = count($questions);
+
+
+$question_ids = array_column($questions, 'question_id');
+$options = [];
+if (!empty($question_ids)) {
+    $placeholders = rtrim(str_repeat('?,', count($question_ids)), ',');
+    $option_sql = "SELECT option_id, question_id, option_text FROM options WHERE question_id IN ($placeholders) ORDER BY option_id ASC";
+    $stmt = $conn->prepare($option_sql);
+
+   
+    $types = str_repeat('i', count($question_ids));
+    $stmt->bind_param($types, ...$question_ids);
+
+    $stmt->execute();
+    $option_result = $stmt->get_result();
+
+    while ($opt = $option_result->fetch_assoc()) {
+        $options[$opt['question_id']][] = $opt;
+    }
+    $stmt->close();
+}
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Quiz Review - Full-Width Header</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Quiz Review - DB Driven</title>
     <style>
-        /* CSS: Black and Blue Theme with Full-Width Header */
+     
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
             background-color: #000;
-            /* Black background */
             color: #fff;
-            /* White text */
         }
 
         .gray-layer {
             background-color: #333;
-            /* Gray background layer */
             padding: 30px 0;
             min-height: 100vh;
-            /* Ensure it covers the entire viewport */
         }
 
         .header {
             width: 100%;
-            /* Full-width header */
             background-color: #222;
-            /* Dark gray header */
             color: #2196F3;
-            /* Blue for header text */
             padding: 10px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid #2196F3;
-            /* Blue underline */
             position: fixed;
-            /* Keep the header fixed at the top */
             top: 0;
             z-index: 1000;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
@@ -52,34 +116,26 @@
             flex: 1;
         }
 
-
         .container {
             max-width: 800px;
             margin: 80px auto 0;
-            /* Add top margin to avoid overlap with fixed header */
             padding: 20px;
             background-color: #222;
-            /* Dark gray content box */
             border-radius: 10px;
-            /* Rounded corners for the content box */
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-            /* Subtle shadow for elevation */
         }
 
         .quiz-info {
             background-color: #444;
-            /* Lighter gray for quiz info */
             margin-top: 20px;
             padding: 15px;
             border-radius: 5px;
             box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
-            /* Soft white shadow */
         }
 
         .quiz-info h2 {
             text-align: center;
             color: #2196F3;
-            /* Blue title */
             margin: 0 0 10px;
         }
 
@@ -90,20 +146,16 @@
 
         .questions-container {
             margin-top: 20px;
-
         }
 
         .question-item {
             background-color: #333;
-            /* Background color of the question card */
             margin-bottom: 25px;
             padding: 45px;
             border-radius: 5px;
             box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
-            /* Soft white shadow */
             color: #fff;
             position: relative;
-            /* Relative to position the edit button inside */
         }
 
         .question-item p {
@@ -111,7 +163,6 @@
             font-weight: bold;
         }
 
-        /* Remove default list styles */
         .question-item ul {
             list-style-type: none;
             padding: 0;
@@ -121,90 +172,67 @@
             display: flex;
             align-items: center;
             margin: 10px 0;
+            cursor: not-allowed;
         }
 
         .question-item li::before {
             content: '●';
-            /* Circle before each option */
             color: #555;
-            /* Default gray color for circles */
             font-size: 18px;
             margin-right: 10px;
         }
 
         .question-item li.preselected::before {
             color: #2196F3;
-            /* Blue color for preselected circle */
         }
 
         .question-item li.disabled::before {
             color: #555;
-            /* Default gray for disabled circles */
         }
 
         .question-item li .option-box {
             background-color: #fff;
-            /* White background for option box */
             color: #333;
-            /* Dark text for option */
             padding: 10px 15px;
             border-radius: 5px;
             border: 1px solid #555;
-            /* Border around the option box */
             width: 100%;
-            /* Full width for the option box */
             display: inline-block;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
         }
 
         .question-item li.preselected .option-box {
             border-color: #2196F3;
-            /* Blue border for preselected option */
         }
 
         .question-item li.disabled .option-box {
             background-color: #f0f0f0;
-            /* Light gray background for disabled option */
             color: #999;
-            /* Gray text for disabled option */
             pointer-events: none;
-            /* Disable user interaction */
             cursor: not-allowed;
-            /* Not-allowed cursor */
         }
-
 
         .edit-btn {
             background: #2196F3;
-            /* Blue button */
             color: #fff;
-            /* White text */
             border: none;
             border-radius: 5px;
             padding: 5px 10px;
             cursor: pointer;
             font-weight: bold;
             position: absolute;
-            /* Position it relative to the question card */
             bottom: 15px;
-            /* Distance from bottom of the card */
             right: 15px;
-            /* Distance from left of the card */
         }
 
         .edit-btn:hover {
             background: #42a5f5;
-            /* Lighter blue hover */
         }
 
         .done-btn {
             display: block;
             width: 100%;
             background-color: #2196F3;
-            /* Blue button */
             color: #fff;
-            /* White text */
             border: none;
             padding: 15px;
             border-radius: 5px;
@@ -216,15 +244,12 @@
 
         .done-btn:hover {
             background: #42a5f5;
-            /* Lighter blue hover */
         }
 
-        /* Add More Question Button */
         .add-question-btn {
             display: block;
             width: 100%;
             background-color: #4caf50;
-            /* Green button */
             color: #fff;
             border: none;
             padding: 15px;
@@ -237,599 +262,540 @@
 
         .add-question-btn:hover {
             background-color: #45a049;
-            /* Darker green on hover */
         }
-
-        /* New Question Form */
-        .new-question-form {
-            background-color: #444;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .new-question-form input[type="text"] {
-            width: 97%;
-            padding: 10px;
-            margin-top: 0px 0;
-            border-radius: 5px;
-            border: 1px solid #555;
-            background-color: #fff;
-            color: #333;
-        }
-
-        .new-question-form .option-input {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .new-question-form .option-input input[type="text"] {
-            flex: 1;
-            padding: 10px;
-            margin-right: 10px;
-            border-radius: 5px;
-            border: 1px solid #555;
-            background-color: #fff;
-            color: #333;
-        }
-
-        .new-question-form .option-input input[type="radio"] {
-            cursor: pointer;
-        }
-
-        .new-question-form .done-question-btn {
-            display: block;
-            width: 100%;
-            background-color: #2196F3;
-            /* Blue button */
-            color: #fff;
-            border: none;
-            padding: 15px;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            font-weight: bold;
-            margin-top: 20px;
-        }
-
-        .new-question-form .done-question-btn:hover {
-            background-color: #42a5f5;
-        }
-
-        /* Cross Icon to Remove the Question Form */
-        .remove-question-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 18px;
-            color: #ff0000;
-            /* Red cross icon */
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .remove-question-btn:hover {
-            color: #ff5555;
-            /* Lighter red on hover */
-        }
-
-        /* Edit Title Icon Styles */
-        .edit-title-btn {
-            background: none;
-            border: none;
-            color: #2196F3;
-            font-size: 20px;
-            cursor: pointer;
-            margin-left: 10px;
-        }
-
-        .edit-title-btn:hover {
-            color: #42a5f5;
-        }
+        
     </style>
 </head>
 
 <body>
-
-    <!-- Gray Background Layer -->
     <div class="gray-layer">
-        <!-- Full-Width Header -->
         <header class="header">
-            <!-- Back Button -->
-            <!-- Logo -->
             <h1>Quiz Review</h1>
         </header>
 
-        <!-- Content Container -->
         <div class="container">
-            <!-- Quiz Info Section -->
             <div class="quiz-info">
                 <h2 id="quiz-title">
-                    Business Terms Beginner Level Quiz 1
+                    <span id="title-text"><?php echo htmlspecialchars($quiz['quiz_title'], ENT_QUOTES, 'UTF-8'); ?></span>
                     <button id="edit-title-btn" class="edit-title-btn">✏️</button>
                 </h2>
-                <p>Total questions (1)</p>
+                <p>Total questions (<?php echo $total_questions; ?>)</p>
             </div>
 
-
-            <!-- Single Question -->
             <div class="questions-container" id="questions-container">
-                <div class="question-item" id="question-1">
-                    <p><strong>1.</strong> What is the synonym of sad?</p>
-                    <ul>
-                        <li class="disabled">
-                            <span class="option-box">Angry</span>
-                        </li>
-                        <li class="preselected">
-                            <span class="option-box">Depressed</span>
-                        </li>
-                        <li class="disabled">
-                            <span class="option-box">Crazy</span>
-                        </li>
-                        <li class="disabled">
-                            <span class="option-box">Anxious</span>
-                        </li>
-                    </ul>
-
-
-                    <button class="edit-btn" onclick="toggleEditDone(this)">Edit</button>
-
-                </div>
+                <?php if ($total_questions > 0): ?>
+                    <?php foreach ($questions as $index => $q): ?>
+                        <div class="question-item" id="question-<?php echo $q['question_id']; ?>">
+                            <p><strong><?php echo $index + 1; ?>.</strong> <?php echo htmlspecialchars($q['question_text'], ENT_QUOTES, 'UTF-8'); ?></p>
+                            <ul>
+                                <?php
+                                $q_options = isset($options[$q['question_id']]) ? $options[$q['question_id']] : [];
+                                foreach ($q_options as $opt) {
+                                    $is_correct = ($opt['option_id'] == $q['correct_option_id']);
+                                    $li_class = $is_correct ? 'preselected' : 'disabled';
+                                ?>
+                                    <li class="<?php echo $li_class; ?>">
+                                        <span class="option-box"><?php echo htmlspecialchars($opt['option_text'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                    </li>
+                                <?php } ?>
+                            </ul>
+                            <button class="edit-btn" onclick="toggleEditDone(this)">Edit</button>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <p>No questions found for this quiz.</p>
+                <?php endif; ?>
             </div>
-            <!-- Add this button inside the container, below the existing questions -->
-            <!-- Add the "Add More Question" button -->
+
             <button class="add-question-btn" id="add-question-btn">Add More Question</button>
-
-
-            <!-- Done Button -->
-            <button class="done-btn"><a href="admindashboard.php">Done</a></button>
-
-            <!-- Footer -->
-
+            <button class="done-btn">Done</button>
         </div>
     </div>
 
     <script>
-        // JavaScript: Back Button Functionality
+        const quizId = <?php echo (int)$quiz_id; ?>;
+        const editTitleBtn = document.getElementById('edit-title-btn');
+        const titleTextElement = document.getElementById('title-text');
+        let originalTitle = titleTextElement.textContent;
 
+        editTitleBtn.addEventListener('click', enterTitleEditMode);
 
-        // JavaScript: Done Button Functionality
-        // Declare the doneButton only once
-        // Select the done button
-        const doneButton = document.querySelector('.done-btn');
+        function enterTitleEditMode() {
+            const titleContainer = document.getElementById('quiz-title');
+            titleContainer.innerHTML = '';
 
-        doneButton.addEventListener('click', () => {
-            const isEditing = Array.from(document.querySelectorAll('.edit-btn')).some(btn => btn.textContent === 'Done');
+            
+            const form = document.createElement('form');
+            form.action = 'updatequiztitle.php';
+            form.method = 'POST';
 
-            if (isEditing) {
-                const confirmed = confirm('There are still questions in edit mode. Do you want to save changes and exit edit mode?');
-                if (!confirmed) return; // If the user cancels, do not proceed
-            }
+            
+            const quizIdInput = document.createElement('input');
+            quizIdInput.type = 'hidden';
+            quizIdInput.name = 'quiz_id';
+            quizIdInput.value = quizId;
+            form.appendChild(quizIdInput);
 
-            // Exit edit mode for all questions
-            const editButtons = document.querySelectorAll('.edit-btn');
-            editButtons.forEach(button => {
-                if (button.textContent === 'Done') {
-                    const parentQuestion = button.closest('.question-item');
-                    button.textContent = 'Edit';
-                    saveAndDisableEditing(parentQuestion); // Save changes and disable editing
-                }
+           
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.name = 'new_title';
+            input.value = originalTitle;
+            input.className = 'title-edit-input';
+            input.id = 'title-input';
+            form.appendChild(input);
+
+            
+            input.focus();
+
+            
+            const saveBtn = document.createElement('button');
+            saveBtn.type = 'submit';
+            saveBtn.className = 'edit-title-btn';
+            saveBtn.textContent = '✔️';
+            form.appendChild(saveBtn);
+
+            titleContainer.appendChild(form);
+        }
+
+        function enableQuestionEdit(questionId) {
+            const questionItem = document.getElementById('question-' + questionId);
+
+            
+            const questionTextElem = questionItem.querySelector('p');
+            const originalQuestionText = questionTextElem.textContent.replace(/^\d+\.\s*/, '').trim();
+
+            const optionItems = questionItem.querySelectorAll('li');
+            const optionsData = [];
+            let correctIndex = 0;
+
+            optionItems.forEach((li, idx) => {
+                const text = li.querySelector('.option-box').textContent.trim();
+                const isPreselected = li.classList.contains('preselected');
+                optionsData.push(text);
+                if (isPreselected) correctIndex = idx;
             });
 
-            alert('Quiz review is completed!');
-        });
-        let questionCount = 1; // Keeps track of the number of questions
+            
+            questionItem.innerHTML = '';
 
-        // Function to add a new question form
-        // Function to add a new question form
-        document.getElementById('add-question-btn').addEventListener('click', () => {
-            questionCount++;
+           
+            const form = document.createElement('form');
+            form.action = 'update_question.php'; 
+            form.method = 'POST';
 
-            // Create a new form for adding a question
-            const newQuestionForm = document.createElement('div');
-            newQuestionForm.classList.add('new-question-form');
-            newQuestionForm.id = `new-question-form-${questionCount}`;
-            newQuestionForm.innerHTML = `
-        <button class="remove-question-btn" onclick="removeQuestionForm('${newQuestionForm.id}')">❌</button>
+           
+            const qIdInput = document.createElement('input');
+            qIdInput.type = 'hidden';
+            qIdInput.name = 'question_id';
+            qIdInput.value = questionId;
+            form.appendChild(qIdInput);
+
+           
+            const qInput = document.createElement('input');
+            qInput.type = 'text';
+            qInput.name = 'question_text';
+            qInput.value = originalQuestionText;
+            qInput.className = 'title-edit-input';
+            form.appendChild(qInput);
+
+           
+            for (let i = 0; i < optionsData.length; i++) {
+                const optDiv = document.createElement('div');
+                optDiv.className = 'option-input';
+
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = 'correct_option';
+                radio.value = i; 
+                if (i === correctIndex) radio.checked = true;
+                optDiv.appendChild(radio);
+
+                const optInput = document.createElement('input');
+                optInput.type = 'text';
+                optInput.name = 'options[]';
+                optInput.value = optionsData[i];
+                optDiv.appendChild(optInput);
+
+                form.appendChild(optDiv);
+            }
+
+           
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.textContent = 'Remove Question';
+            removeBtn.className = 'remove-question-btn';
+            removeBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to delete this question?')) {
+                    window.location.href = 'delete_question.php?question_id=' + questionId;
+                }
+            });
+            form.appendChild(removeBtn);
+
+           
+            const doneBtn = document.createElement('button');
+            doneBtn.type = 'submit';
+            doneBtn.textContent = 'Done';
+            doneBtn.className = 'done-question-btn';
+            form.appendChild(doneBtn);
+
+            questionItem.appendChild(form);
+        }
+
         
-        <label for="question-title-${questionCount}"><strong>Question Title</strong></label>
-        <input type="text" id="question-title-${questionCount}" placeholder="Enter your question title here" required>
+        const addQuestionBtn = document.getElementById('add-question-btn');
+        addQuestionBtn.addEventListener('click', addNewQuestionForm);
 
-        <div class="option-input">
-            <input type="radio" name="correct-option-${questionCount}" value="1">
-            <input type="text" id="option-1-${questionCount}" placeholder="Option 1" required>
-        </div>
-
-        <div class="option-input">
-            <input type="radio" name="correct-option-${questionCount}" value="2">
-            <input type="text" id="option-2-${questionCount}" placeholder="Option 2" required>
-        </div>
-
-        <div class="option-input">
-            <input type="radio" name="correct-option-${questionCount}" value="3">
-            <input type="text" id="option-3-${questionCount}" placeholder="Option 3" required>
-        </div>
-
-        <div class="option-input">
-            <input type="radio" name="correct-option-${questionCount}" value="4">
-            <input type="text" id="option-4-${questionCount}" placeholder="Option 4" required>
-        </div>
-
-        <button class="done-question-btn" onclick="addNewQuestion('${newQuestionForm.id}')">Done</button>
-    `;
-
-            // Add new form to the questions container
-            document.getElementById('questions-container').appendChild(newQuestionForm);
-        });
-
-        // Function to remove the question form
-        function removeQuestionForm(formId) {
-            const formElement = document.getElementById(formId);
-            if (formElement) {
-                formElement.remove();
-            }
-        }
-
-        // Function to update the numbering of all questions
-        // Function to toggle between Edit and Done
-        // Function to update the total number of questions shown
-        function updateTotalQuestions() {
-            const totalQuestionsCount = document.querySelectorAll('.question-item').length; // Count the question items
-            const totalQuestionsElement = document.querySelector('.quiz-info p'); // The paragraph showing total questions
-            totalQuestionsElement.textContent = `Total questions (${totalQuestionsCount})`; // Update the text
-        }
-
-        // Function to toggle between Edit and Done
-        function toggleEditDone(button) {
-            const parentQuestion = button.closest('.question-item'); // Get the parent question item
-            const isEdit = button.textContent === 'Edit'; // Check if it's currently in Edit mode
-
-            if (isEdit) {
-                button.textContent = 'Done'; // Change button to Done
-                enableEditing(parentQuestion); // Enable editing for question and options
-            } else {
-                button.textContent = 'Edit'; // Change button back to Edit
-                disableEditing(parentQuestion); // Save changes and disable editing
-            }
-        }
-
-        function saveAndDisableEditing(questionCard) {
-            const questionTextElement = questionCard.querySelector('p'); // The <p> containing the question
-            const questionNumber = questionTextElement.querySelector('strong').textContent; // Keep the numbering intact
-            const questionInput = questionTextElement.querySelector('.edit-title-input'); // The input field for the question title
-
-            // Save the updated question title
-            if (questionInput) {
-                const newQuestionText = questionInput.value.trim();
-                questionTextElement.innerHTML = `<strong>${questionNumber}</strong> ${newQuestionText}`;
-            }
-
-            // Save the updated options and set the selected option
-            const options = questionCard.querySelectorAll('li'); // Get all option list items (li)
-            options.forEach(option => {
-                const optionInput = option.querySelector('.edit-option-input'); // The input field for the option text
-                if (optionInput) {
-                    const newOptionText = optionInput.value.trim();
-                    option.querySelector('.option-box').textContent = newOptionText; // Replace input with text
-                }
-
-                // Check if this option is currently selected (preselected)
-                if (option.classList.contains('preselected')) {
-                    option.classList.add('preselected'); // Keep this option selected
-                    option.classList.remove('disabled'); // Ensure it's active
-                } else {
-                    option.classList.add('disabled'); // Disable all other options
-                    option.classList.remove('preselected'); // Remove selection status from other options
-                }
-
-                option.style.cursor = 'not-allowed'; // Disable interaction for options after editing
-                option.removeEventListener('click', handleOptionSelect); // Remove click event for selecting option
-            });
-
-            // Remove the edit-specific cross icon
-            const editRemoveBtn = questionCard.querySelector('.edit-remove-btn');
-            if (editRemoveBtn) editRemoveBtn.remove();
-        }
-        // Enable editing (make question and options editable)
-        // Enable editing (make question and options editable)
-        // Enable editing (make question and options editable)
-        // Enable editing (make question and options editable)
-        // Enable editing (make question and options editable)
-        // Enable editing (make question and options editable)
-        function enableEditing(questionCard) {
-            const questionTextElement = questionCard.querySelector('p'); // The <p> containing the question
-            const questionNumber = questionTextElement.querySelector('strong').textContent; // Keep the numbering intact
-            const currentQuestionText = questionTextElement.textContent.replace(questionNumber, '').trim(); // Extract the question text
-
-            // Replace question text with an input field, keeping numbering fixed
-            questionTextElement.innerHTML = `
-        <strong>${questionNumber}</strong> 
-        <input type="text" value="${currentQuestionText}" class="edit-title-input" />
-    `;
-
-            // Add a cross icon for removing the question during edit mode
-            if (!questionCard.querySelector('.edit-remove-btn')) {
-                const removeBtn = document.createElement('button');
-                removeBtn.textContent = '❌';
-                removeBtn.classList.add('edit-remove-btn');
-                removeBtn.style.position = 'absolute';
-                removeBtn.style.top = '20px';
-                removeBtn.style.right = '20px';
-                removeBtn.style.color = '#ff0000';
-                removeBtn.style.background = 'none';
-                removeBtn.style.border = 'none';
-                removeBtn.style.cursor = 'pointer';
-                removeBtn.style.fontSize = '18px';
-                removeBtn.style.fontWeight = 'bold';
-
-                removeBtn.addEventListener('click', () => removeEditedQuestion(questionCard));
-                questionCard.appendChild(removeBtn);
-            }
-
-            // Enable option selection and editing
-            const options = questionCard.querySelectorAll('li'); // Get all option list items (li)
-            options.forEach(option => {
-                option.classList.remove('disabled'); // Remove "disabled" to allow user interaction
-                option.style.cursor = 'pointer'; // Change cursor to pointer to show it's clickable
-
-                const optionBox = option.querySelector('.option-box'); // Option box to allow editing
-                const currentOptionText = optionBox.textContent.trim(); // Get current text
-                optionBox.innerHTML = `<input type="text" value="${currentOptionText}" class="edit-option-input" />`; // Replace with input
-
-                // Add event listener for selecting option (only in edit mode)
-                option.addEventListener('click', handleOptionSelect);
-            });
-        }
-
-        // Handle option selection (only in edit mode)
-        function handleOptionSelect(event) {
-            const option = event.currentTarget; // The clicked option (li)
-            const options = option.parentElement.querySelectorAll('li'); // All sibling options
-
-            // Remove 'preselected' class from all options of this question
-            options.forEach(opt => opt.classList.remove('preselected'));
-
-            // Add 'preselected' to the clicked option
-            option.classList.add('preselected');
-        }
-
-        // Disable editing (save changes and remove input fields)
-        function disableEditing(questionCard) {
-            const questionTextElement = questionCard.querySelector('p'); // The <p> containing the question
-            const questionNumber = questionTextElement.querySelector('strong').textContent; // Keep the numbering intact
-            const questionInput = questionTextElement.querySelector('.edit-title-input'); // The input field for the question title
-
-            // Revert the question title
-            if (questionInput) {
-                const originalQuestionText = questionInput.defaultValue.trim(); // Revert to original value
-                questionTextElement.innerHTML = `<strong>${questionNumber}</strong> ${originalQuestionText}`;
-            }
-
-            // Revert options to their original state
-            const options = questionCard.querySelectorAll('li'); // All option list items
-            options.forEach(option => {
-                const optionInput = option.querySelector('.edit-option-input'); // The input field for the option text
-                if (optionInput) {
-                    const originalOptionText = optionInput.defaultValue.trim(); // Revert to original value
-                    option.querySelector('.option-box').textContent = originalOptionText; // Replace input with text
-                }
-
-                // Restore the option selection status (preselected/disabled)
-                if (option.classList.contains('preselected')) {
-                    option.classList.add('preselected'); // Restore the original preselected option
-                    option.classList.remove('disabled'); // Ensure it's not disabled
-                } else {
-                    option.classList.add('disabled'); // Disable all other options
-                    option.classList.remove('preselected'); // Remove any selection status added during edit
-                }
-
-                option.style.cursor = 'not-allowed'; // Disable interaction for options after editing
-                option.removeEventListener('click', handleOptionSelect); // Remove click event for selecting option
-            });
-
-            // Remove the edit-specific cross icon
-            const editRemoveBtn = questionCard.querySelector('.edit-remove-btn');
-            if (editRemoveBtn) editRemoveBtn.remove();
-        }
-        // Remove question during Edit mode with confirmation
-        function removeEditedQuestion(questionCard) {
-            const questionItems = document.querySelectorAll('.question-item'); // Get all question cards
-
-            if (questionItems.length > 1) {
-                const confirmed = confirm("Are you sure you want to delete this question?"); // Ask for confirmation
-                if (confirmed) {
-                    questionCard.remove();
-                    updateQuestionNumbers(); // Update the numbering after removal
-                    updateTotalQuestions(); // Update the total questions count
-                }
-            } else {
-                alert('At least one question must remain in the quiz.');
-            }
-        }
-
-        // Function to update the numbering of all questions
-        function updateQuestionNumbers() {
-            const questionItems = document.querySelectorAll('.question-item'); // Get all question cards
-            questionItems.forEach((question, index) => {
-                const questionNumberElement = question.querySelector('p strong'); // The <strong> element for numbering
-                questionNumberElement.textContent = `${index + 1}.`; // Update numbering (1, 2, 3, ... )
-            });
-            updateTotalQuestions(); // Always update total questions after numbering
-        }
-
-        // Function to update the total number of questions shown
-        function updateTotalQuestions() {
-            const totalQuestionsCount = document.querySelectorAll('.question-item').length; // Count the question items
-            const totalQuestionsElement = document.querySelector('.quiz-info p'); // The paragraph showing total questions
-            totalQuestionsElement.textContent = `Total questions (${totalQuestionsCount})`; // Update the text
-        }
-
-
-        // Function to add a new question
-        function addNewQuestion(formId) {
-            const formElement = document.getElementById(formId);
-            const questionTitle = formElement.querySelector(`#question-title-${formId.split('-').pop()}`).value;
-
-            // Get all option inputs
-            const options = [
-                formElement.querySelector(`#option-1-${formId.split('-').pop()}`).value,
-                formElement.querySelector(`#option-2-${formId.split('-').pop()}`).value,
-                formElement.querySelector(`#option-3-${formId.split('-').pop()}`).value,
-                formElement.querySelector(`#option-4-${formId.split('-').pop()}`).value
-            ];
-
-            // Get the correct option
-            const correctOption = formElement.querySelector(`input[name="correct-option-${formId.split('-').pop()}"]:checked`);
-
-            // Validation: Check for empty fields
-            if (!questionTitle.trim()) {
-                alert("Please enter the question title.");
+        function addNewQuestionForm() {
+            
+            const existingAddForm = document.querySelector('.question-item form[action="add_question.php"]');
+            if (existingAddForm) {
+                alert('You are already adding a new question. Please finish adding it before adding another one.');
                 return;
             }
 
-            for (let i = 0; i < options.length; i++) {
-                if (!options[i].trim()) {
-                    alert(`Option ${i + 1} cannot be empty.`);
+            
+            const editingQuestion = document.querySelector('.question-item input.edit-question-text, .question-item input.edit-option-input[name="options[]"]');
+            if (editingQuestion) {
+                alert('You are currently editing a question. Please finish editing it before adding a new question.');
+                return;
+            }
+
+            const container = document.getElementById('questions-container');
+
+            const questionItem = document.createElement('div');
+            questionItem.className = 'question-item';
+
+            const form = document.createElement('form');
+            form.action = 'add_question.php';
+            form.method = 'POST';
+            form.style.position = 'relative';
+
+            const quizIdInput = document.createElement('input');
+            quizIdInput.type = 'hidden';
+            quizIdInput.name = 'quiz_id';
+            quizIdInput.value = quizId;
+            form.appendChild(quizIdInput);
+
+            const questionTextElem = document.createElement('p');
+            questionTextElem.style.marginBottom = '10px';
+            const qInput = document.createElement('input');
+            qInput.type = 'text';
+            qInput.name = 'question_text';
+            qInput.className = 'edit-question-text title-edit-input';
+            qInput.placeholder = 'Enter question title';
+            questionTextElem.appendChild(qInput);
+            form.appendChild(questionTextElem);
+
+            const ul = document.createElement('ul');
+            ul.style.listStyleType = 'none';
+            ul.style.padding = '0';
+
+            for (let i = 1; i <= 4; i++) {
+                const li = document.createElement('li');
+                li.style.cursor = 'default';
+                li.style.margin = '10px 0';
+
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = 'correct_option';
+                radio.value = i;
+                li.appendChild(radio);
+
+                const optInput = document.createElement('input');
+                optInput.type = 'text';
+                optInput.name = 'options[]';
+                optInput.className = 'edit-option-input';
+                optInput.style.marginLeft = '10px';
+                optInput.placeholder = `Option ${i}`;
+                li.appendChild(optInput);
+
+                ul.appendChild(li);
+            }
+            form.appendChild(ul);
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.textContent = 'Remove';
+            removeBtn.style.position = 'absolute';
+            removeBtn.style.top = '15px';
+            removeBtn.style.right = '15px';
+            removeBtn.style.background = 'red';
+            removeBtn.style.color = '#fff';
+            removeBtn.style.border = 'none';
+            removeBtn.style.borderRadius = '5px';
+            removeBtn.style.padding = '5px 10px';
+            removeBtn.style.cursor = 'pointer';
+            removeBtn.style.fontWeight = 'bold';
+            removeBtn.addEventListener('click', () => {
+                questionItem.remove();
+            });
+            form.appendChild(removeBtn);
+
+            const doneBtn = document.createElement('button');
+            doneBtn.type = 'submit';
+            doneBtn.textContent = 'Done';
+            doneBtn.className = 'done-question-btn';
+            doneBtn.style.marginTop = '20px';
+            form.appendChild(doneBtn);
+
+            form.addEventListener('submit', function(e) {
+                const questionTitle = qInput.value.trim();
+                if (!questionTitle) {
+                    alert('Please fill in the question title.');
+                    e.preventDefault();
                     return;
                 }
-            }
 
-            if (!correctOption) {
-                alert("Please select the correct answer.");
-                return;
-            }
+                const optionInputs = form.querySelectorAll('input[name="options[]"]');
+                for (let opt of optionInputs) {
+                    if (!opt.value.trim()) {
+                        alert('Please fill in all options.');
+                        e.preventDefault();
+                        return;
+                    }
+                }
 
-            // Create a new question card
-            const newQuestion = document.createElement('div');
-            newQuestion.classList.add('question-item');
-            newQuestion.innerHTML = `
-        <p><strong></strong> ${questionTitle}</p>
-        <ul>
-            ${options.map((option, index) => `
-                <li class="${correctOption.value == index + 1 ? 'preselected' : 'disabled'}">
-                    <span class="option-box">${option}</span>
-                </li>
-            `).join('')}
-        </ul>
-        <button class="edit-btn" onclick="toggleEditDone(this)">Edit</button>
-    `;
+                const correctSelected = form.querySelector('input[name="correct_option"]:checked');
+                if (!correctSelected) {
+                    alert('Please select a correct option.');
+                    e.preventDefault();
+                    return;
+                }
+                
+            });
 
-            // Add new question to the questions container
-            document.getElementById('questions-container').appendChild(newQuestion);
-
-            // Remove the form after adding the question
-            formElement.remove();
-
-            // Update the question numbers and total questions
-            updateQuestionNumbers();
+            questionItem.appendChild(form);
+            container.appendChild(questionItem);
         }
-        // Function to save the quiz title
-        // Function to save the quiz title
-        // Function to save the quiz title
-        // Function to save the quiz title
-        // Function to save the quiz title
-        // Initialize quiz title edit functionality
-        // Initialize quiz title edit functionality
-        function initializeTitleEdit() {
-            const quizTitleElement = document.querySelector('.quiz-info h2'); // Quiz title container
 
-            // Remove any previously added edit button if it exists
-            const existingEditButton = document.querySelector('#edit-title-btn');
-            if (existingEditButton) {
-                existingEditButton.remove();
-            }
+        
+        function toggleEditDone(button) {
+            const questionItem = button.closest('.question-item');
+            const isEditing = (button.textContent === 'Done');
+            const questionId = questionItem.getAttribute('id') ? questionItem.getAttribute('id').replace('question-', '') : 0;
 
-            // Create the edit icon
-            const editIcon = document.createElement('button');
-            editIcon.id = 'edit-title-btn';
-            editIcon.classList.add('edit-title-btn');
-            editIcon.textContent = '✏️'; // Icon for edit
-            editIcon.title = 'Edit title';
-            editIcon.style.marginLeft = '10px'; // Align icon next to title
-            editIcon.style.cursor = 'pointer'; // Pointer cursor for interactivity
-            editIcon.style.border = 'none'; // Clean button styling
-            editIcon.style.background = 'transparent'; // Transparent background
+            if (isEditing) {
+                const questionTextInput = questionItem.querySelector('.edit-question-text');
+                const questionText = questionTextInput ? questionTextInput.value.trim() : '';
 
-            // Append the edit icon next to the title
-            quizTitleElement.appendChild(editIcon);
+                const optionInputs = questionItem.querySelectorAll('.edit-option-input');
+                const options = [];
+                optionInputs.forEach(opt => options.push(opt.value.trim()));
 
-            // Function to handle entering edit mode
-            function enterEditMode() {
-                const currentTitle = quizTitleElement.querySelector('span')?.textContent || 'Untitled Quiz';
+                const correctRadio = questionItem.querySelector('input[name="edit-correct-option"]:checked');
+                const correctIndex = correctRadio ? parseInt(correctRadio.value, 10) : -1;
 
-                // Clear existing content
-                quizTitleElement.innerHTML = '';
+                if (!questionText || options.some(o => !o) || correctIndex < 0) {
+                    alert('Please fill in all fields and select the correct option.');
+                    return;
+                }
 
-                // Create an input field for editing the title
-                const titleInput = document.createElement('input');
-                titleInput.type = 'text';
-                titleInput.id = 'title-input';
-                titleInput.value = currentTitle;
-                titleInput.placeholder = 'Enter quiz title...';
-                titleInput.classList.add('title-edit-input');
-                titleInput.style.width = '80%'; // Ensure the input fits within the container
-                titleInput.style.padding = '5px'; // Add padding for better UX
-                titleInput.style.fontSize = '16px'; // Match title size
-                titleInput.style.marginRight = '10px'; // Space for the tick icon
+                const form = document.createElement('form');
+                form.action = 'update_question.php';
+                form.method = 'POST';
 
-                // Append the input to the title container
-                quizTitleElement.appendChild(titleInput);
+                const qIdInput = document.createElement('input');
+                qIdInput.type = 'hidden';
+                qIdInput.name = 'question_id';
+                qIdInput.value = questionId;
+                form.appendChild(qIdInput);
 
-                // Automatically focus the input field
-                titleInput.focus();
+                const qTextInput = document.createElement('input');
+                qTextInput.type = 'hidden';
+                qTextInput.name = 'question_text';
+                qTextInput.value = questionText;
+                form.appendChild(qTextInput);
 
-                // Change the icon to a save (tick) icon
-                editIcon.textContent = '✔️'; // Tick icon for saving
-                editIcon.title = 'Save title';
+                options.forEach(o => {
+                    const optHidden = document.createElement('input');
+                    optHidden.type = 'hidden';
+                    optHidden.name = 'options[]';
+                    optHidden.value = o;
+                    form.appendChild(optHidden);
+                });
 
-                // Save the new title on "Enter" key press
-                titleInput.addEventListener('keydown', (event) => {
-                    if (event.key === 'Enter') {
-                        saveTitle();
+                const correctHidden = document.createElement('input');
+                correctHidden.type = 'hidden';
+                correctHidden.name = 'correct_option';
+                correctHidden.value = correctIndex;
+                form.appendChild(correctHidden);
+
+                document.body.appendChild(form);
+                form.submit();
+
+            } else {
+                
+
+              
+                const addingQuestionForm = document.querySelector('.question-item form[action="add_question.php"]');
+                if (addingQuestionForm) {
+                    alert('You are currently adding a new question. Please finish adding it before editing another question.');
+                    return; 
+                }
+
+               
+                const editingButtons = document.querySelectorAll('.question-item .edit-btn');
+                for (let btn of editingButtons) {
+                    if (btn !== button && btn.textContent === 'Done') {
+                        alert('You are currently editing another question. Please finish that one first before editing this question.');
+                        return; 
+                    }
+                }
+
+               
+                button.textContent = 'Done';
+
+                const questionTextElem = questionItem.querySelector('p');
+                const originalQuestionText = questionTextElem.textContent.replace(/^\d+\.\s*/, '').trim();
+
+                const ul = questionItem.querySelector('ul');
+                const optionLis = ul.querySelectorAll('li');
+                const optionsData = [];
+                let correctIndex = 0;
+                optionLis.forEach((li, idx) => {
+                    const text = li.querySelector('.option-box').textContent.trim();
+                    optionsData.push(text);
+                    if (li.classList.contains('preselected')) correctIndex = idx;
+                });
+
+                questionTextElem.innerHTML = '';
+                const questionTextInput = document.createElement('input');
+                questionTextInput.type = 'text';
+                questionTextInput.value = originalQuestionText;
+                questionTextInput.className = 'edit-question-text';
+                questionTextElem.appendChild(questionTextInput);
+
+                ul.innerHTML = '';
+                for (let i = 0; i < optionsData.length; i++) {
+                    const li = document.createElement('li');
+                    li.style.cursor = 'default';
+
+                    const radio = document.createElement('input');
+                    radio.type = 'radio';
+                    radio.name = 'edit-correct-option';
+                    radio.value = i;
+                    if (i === correctIndex) radio.checked = true;
+
+                    const optInput = document.createElement('input');
+                    optInput.type = 'text';
+                    optInput.value = optionsData[i];
+                    optInput.className = 'edit-option-input';
+                    optInput.style.marginLeft = '10px';
+
+                    li.appendChild(radio);
+                    li.appendChild(optInput);
+                    ul.appendChild(li);
+                }
+
+               
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.textContent = 'Remove';
+                removeBtn.style.position = 'absolute';
+                removeBtn.style.top = '15px';
+                removeBtn.style.right = '15px';
+                removeBtn.style.background = 'red';
+                removeBtn.style.color = '#fff';
+                removeBtn.style.border = 'none';
+                removeBtn.style.borderRadius = '5px';
+                removeBtn.style.padding = '5px 10px';
+                removeBtn.style.cursor = 'pointer';
+                removeBtn.style.fontWeight = 'bold';
+
+                removeBtn.addEventListener('click', () => {
+                  
+                    const totalQuestionsCount = document.querySelectorAll('.question-item').length;
+                    if (totalQuestionsCount <= 1) {
+                        alert('At least one question must remain in the quiz.');
+                        return;
+                    }
+
+                    if (confirm('Are you sure you want to delete this question?')) {
+                        window.location.href = 'delete_question.php?question_id=' + questionId;
                     }
                 });
 
-                // Reassign the icon click to save the title
-                editIcon.onclick = saveTitle;
+                questionItem.appendChild(removeBtn);
             }
-
-            // Function to save the quiz title
-            function saveTitle() {
-                const titleInput = document.getElementById('title-input');
-                if (!titleInput) return;
-
-                const newTitle = titleInput.value.trim() || 'Untitled Quiz';
-
-                // Clear the container and restore the title
-                quizTitleElement.innerHTML = '';
-
-                const titleSpan = document.createElement('span');
-                titleSpan.textContent = newTitle; // Save the new title
-                quizTitleElement.appendChild(titleSpan);
-
-                // Restore the edit icon
-                quizTitleElement.appendChild(editIcon);
-                editIcon.textContent = '✏️'; // Back to edit icon
-                editIcon.title = 'Edit title';
-
-                // Reassign the icon click to enter edit mode
-                editIcon.onclick = enterEditMode;
-            }
-
-            // Assign the initial click to enter edit mode
-            editIcon.onclick = enterEditMode;
         }
 
-        // Call the initialize function on page load
-        initializeTitleEdit();
+        const globalDoneButton = document.querySelector('.done-btn');
+        globalDoneButton.addEventListener('click', handleGlobalDone);
+
+        function handleGlobalDone() {
+            const titleInput = document.getElementById('title-input');
+            const anyQuestionEditing = document.querySelector('.question-item input.edit-question-text, .question-item input.edit-option-input');
+            const addingQuestionForm = document.querySelector('.question-item form[action="add_question.php"]'); 
+
+           
+            if (titleInput || anyQuestionEditing || addingQuestionForm) {
+                const confirmed = confirm('Some questions or the quiz title are still being edited. Do you want to save changes and exit edit mode?');
+                if (!confirmed) return; 
+
+              
+                if (addingQuestionForm) {
+                    
+                    const qInput = addingQuestionForm.querySelector('input[name="question_text"]');
+                    const questionTitle = qInput ? qInput.value.trim() : '';
+                    if (!questionTitle) {
+                        alert('Please fill in the question title before finalizing.');
+                        return;
+                    }
+
+                    const optionInputs = addingQuestionForm.querySelectorAll('input[name="options[]"]');
+                    for (let opt of optionInputs) {
+                        if (!opt.value.trim()) {
+                            alert('Please fill in all options before finalizing.');
+                            return; 
+                        }
+                    }
+
+                    const correctSelected = addingQuestionForm.querySelector('input[name="correct_option"]:checked');
+                    if (!correctSelected) {
+                        alert('Please select a correct option before finalizing.');
+                        return; 
+                    }
+
+                 
+                    addingQuestionForm.submit();
+                    return; 
+                }
+
+               
+                if (titleInput) {
+                    const form = titleInput.closest('form');
+                    if (form) {
+                        form.submit();
+                        return;
+                    }
+                }
+
+                
+                const editingButtons = document.querySelectorAll('.question-item .edit-btn');
+                let saveNeeded = false;
+                editingButtons.forEach(btn => {
+                    if (btn.textContent === 'Done') {
+                        saveNeeded = true;
+                        btn.click(); 
+                    }
+                });
+
+                if (!saveNeeded) {
+                   
+                    alert('All changes saved and edit mode exited.');
+                }
+
+            } else {
+                
+                alert('No edits are in progress. All changes are already saved.');
+            }
+        }
     </script>
 </body>
 
 </html>
+
+<?php
+$conn->close();
+?>
