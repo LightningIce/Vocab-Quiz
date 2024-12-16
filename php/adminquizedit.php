@@ -14,8 +14,7 @@ if ($conn->connect_error) {
 }
 
 
-$quiz_id = 1;
-
+$quiz_id = intval($_GET['quiz_id']);
 
 $quiz_sql = "SELECT quiz_title FROM quizzes WHERE quiz_id = ?";
 $stmt = $conn->prepare($quiz_sql);
@@ -790,6 +789,7 @@ if (!empty($question_ids)) {
                 
                 alert('No edits are in progress. All changes are already saved.');
             }
+            window.location.href = 'admindashboard.php';
         }
     </script>
 </body>

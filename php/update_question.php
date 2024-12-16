@@ -17,7 +17,7 @@ $correct_index = isset($_POST['correct_option']) ? (int)$_POST['correct_option']
 
 // Validate input
 if ($question_id <= 0 || $question_text === '' || empty($options) || $correct_index < 0 || $correct_index >= count($options)) {
-    header('Location: htmlphp.php?error=invalid_input');
+    header('Location: adminquizedit.php?error=invalid_input');
     exit;
 }
 
@@ -27,6 +27,23 @@ $stmt = $conn->prepare($update_question_sql);
 $stmt->bind_param('si', $question_text, $question_id);
 $stmt->execute();
 $stmt->close();
+
+// Get the quiz_id associated with the question
+$quiz_id_sql = "SELECT quiz_id FROM questions WHERE question_id = ?";
+$stmt = $conn->prepare($quiz_id_sql);
+$stmt->bind_param('i', $question_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$quiz_row = $result->fetch_assoc();
+$stmt->close();
+
+if ($quiz_row) {
+    $quiz_id = $quiz_row['quiz_id'];
+} else {
+    // Handle the case where quiz_id is not found
+    header('Location: adminquizedit.php?error=quiz_not_found');
+    exit;
+}
 
 // Get existing option_ids for this question
 $get_option_sql = "SELECT option_id FROM options WHERE question_id = ? ORDER BY option_id ASC";
@@ -51,7 +68,6 @@ for ($i = 0; $i < count($options); $i++) {
     $stmt->close();
 }
 
-
 $correct_option_id = $option_ids[$correct_index];
 $update_correct_sql = "UPDATE questions SET correct_option_id = ? WHERE question_id = ?";
 $stmt = $conn->prepare($update_correct_sql);
@@ -61,6 +77,5 @@ $stmt->close();
 
 $conn->close();
 
-
-header('Location: htmlphp.php?success=question_updated');
+header('Location: adminquizedit.php?quiz_id=' . $quiz_id . '&success=question_updated');
 exit;

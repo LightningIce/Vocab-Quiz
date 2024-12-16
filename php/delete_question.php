@@ -22,7 +22,7 @@ $question = $result->fetch_assoc();
 $stmt->close();
 
 if (!$question) {
-    header('Location: htmlphp.php?error=question_not_found');
+    header('Location: adminquizedit.php?error=question_not_found');
     exit;
 }
 
@@ -38,12 +38,10 @@ $row = $result->fetch_assoc();
 $stmt->close();
 
 if ($row['total'] <= 1) {
-    // Cannot delete last question
-    header('Location: htmlphp.php?error=cannot_delete_last_question');
+    header('Location: adminquizedit.php?error=cannot_delete_last_question');
     exit;
 }
 
-// Delete question
 $delete_sql = "DELETE FROM questions WHERE question_id = ?";
 $stmt = $conn->prepare($delete_sql);
 $stmt->bind_param('i', $question_id);
@@ -52,5 +50,5 @@ $stmt->close();
 
 $conn->close();
 
-header('Location: htmlphp.php?success=question_deleted');
+header('Location: adminquizedit.php?quiz_id=' . $quiz_id . '&success=question_deleted');
 exit;

@@ -55,5 +55,5 @@ $stmt->close();
 $conn->close();
 
 // Redirect back to the main page
-header('Location: htmlphp.php?success=question_added');
+header('Location: adminquizedit.php?quiz_id=' . $quiz_id . '&success=question_added');
 exit;

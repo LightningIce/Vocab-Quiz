@@ -384,6 +384,10 @@ $quizzesJson = json_encode($phpQuizzes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_A
                 modalTitle.textContent = quiz.title;
                 modalDescription.textContent = `Details about the "${quiz.title}" quiz can be displayed here.`;
                 modal.style.display = 'block';
+                const takeQuizButton = document.querySelector('.modal-button.review-edit');
+                takeQuizButton.onclick = () => {
+                    window.location.href = `adminquizedit.php?quiz_id=${quiz.id}`;
+                };
                 modal.setAttribute('aria-hidden', 'false');
                 modal.querySelector('.close-button').focus();
             }
