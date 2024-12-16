@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VocabQuiz - Contact Page</title>
+    <link rel="stylesheet" href="../css/student.css">
     <style>
         /* CSS Reset and Base Styles */
         :root {
@@ -64,46 +65,10 @@
         .contact-button:hover {
             background-color: #e58900;
         }
-
-        
-        }
     </style>
 </head>
 <body>
-    <header>
-        <nav>
-            <div class="logo">
-                <img src="icon.png" alt="VocabQuiz Logo">
-                VocabQuiz
-            </div>
-
-            <!-- Hamburger Menu for Mobile -->
-            <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-
-            <ul class="nav-links">
-                <li><a href="HomePage.html">Home</a></li>
-                <li><a href="#quizzes">Quizzes</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
-                <li class="profile">
-                    <div class="profile-toggle" onclick="toggleProfileMenu()">
-                        <img src="Profile_Icon.png" alt="Profile" class="profile-icon">
-                    </div>
-                    <div class="profile-dropdown">
-                        <a href="ProfilePage.php">My Profile</a>
-                        <a href="#history">Quiz History</a>
-                        <a href="#settings">Settings</a>
-                        <a href="#logout">Logout</a>
-                    </div>
-                </li>
-            </ul>
-        </nav>
-    </header>
-
+<?php include 'studentheader.php'; ?>
     <main>
         <section class="contact-section">
             <h1>Contact Us</h1>

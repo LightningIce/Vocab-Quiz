@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['addQuestion'])) {
 
 // Handle Done Action
 if (isset($_GET['done']) && isset($_GET['quiz_id'])) {
-    echo "<script>alert('You have finished adding questions!'); window.location.href = 'dashboard.php';</script>";
+    echo "<script>alert('You have finished adding questions!'); window.location.href = 'admindashboard.php';</script>";
     exit;
 }
 ?>

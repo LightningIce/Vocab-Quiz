@@ -3,7 +3,7 @@
     <header>
         <nav>
             <div class="logo">
-                <img src="../images/profile2.png" alt="VocabQuiz Logo">
+                <img src="../images/icon.png" alt="VocabQuiz Logo">
                 VocabQuiz
             </div>
             <ul class="nav-links">
@@ -14,13 +14,12 @@
                 <li class="profile">
             
                     <div class="profile-toggle" onclick="toggleProfileMenu()">
-                        <img src="../images/icon.png" alt="Profile" class="profile-icon">
+                        <img src="../images/profile2.png" alt="Profile" class="profile-icon">
                     </div>
                     <div class="profile-dropdown">
-                        <a href="#profile">My Profile</a>
-                        <a href="#history">Quiz History</a>
-                        <a href="#settings">Settings</a>
-                        <a href="#logout">Logout</a>
+                        <a href="studentviewprofile.php">My Profile</a>
+                        <a href="studentquizhistory">Quiz History</a>
+                        <a href="logout.php">Logout</a>
                     </div>
                 </li>
             </ul>
