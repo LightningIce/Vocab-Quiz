@@ -16,7 +16,7 @@ if ($conn->connect_error) {
 
 $quiz_id = intval($_GET['quiz_id']);
 
-//fetch question text and correct answer
+
 $quiz_sql = "SELECT quiz_title FROM quizzes WHERE quiz_id = ?";
 $stmt = $conn->prepare($quiz_sql);
 $stmt->bind_param("i", $quiz_id);
@@ -29,7 +29,7 @@ if (!$quiz) {
     die("Quiz not found.");
 }
 
-//fetch options
+
 $question_sql = "
     SELECT q.question_id, q.question_text, q.correct_option_id
     FROM questions q
