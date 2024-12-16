@@ -3,7 +3,7 @@
     <header>
         <nav>
             <div class="logo">
-                <img src="../images/icon.png" alt="VocabQuiz Logo">
+                <img src="../images/profile2.png" alt="VocabQuiz Logo">
                 VocabQuiz
             </div>
             <ul class="nav-links">
